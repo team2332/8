@@ -3,263 +3,492 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نظام التحقق والانضمام</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>Falcon MC - بوابة اللاعبين</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
-    body { background-color: #0b0b0b; color: #e5e7eb; font-family: system-ui, -apple-system, sans-serif; }
-    .gold-text { color: #d4af37; }
-    .gold-border { border-color: #d4af37; }
-    .gold-bg { background-color: #d4af37; color: #000; }
-    .gold-bg:hover { background-color: #b89628; }
-    .red-border { border-color: #dc2626; }
-    .red-bg { background-color: #dc2626; color: #fff; }
-    .red-bg:hover { background-color: #b91c1c; }
-    .gui-card { background: rgba(24, 24, 27, 0.85); backdrop-filter: blur(10px); border: 1px solid #3f3f46; }
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: #151c2c;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --discord-color: #5865F2;
+      --discord-hover: #4752C4;
+      --text-main: #f3f4f6;
+      --text-sub: #9ca3af;
+      --input-bg: #1e293b;
+      --border-color: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0; padding: 0;
+      font-family: 'Cairo', sans-serif;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background-image: 
+        radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(88, 101, 242, 0.1) 0%, transparent 40%);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-bg);
+      padding: 35px 30px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #10b981, #5865F2);
+    }
+
+    .header { text-align: center; margin-bottom: 20px; }
+    .header h1 { font-size: 26px; font-weight: 900; color: #fff; margin-bottom: 5px; }
+    .header p { color: var(--text-sub); font-size: 13px; }
+
+    .tab-container {
+      display: flex;
+      background: var(--input-bg);
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border-color);
+    }
+
+    .tab-btn {
+      flex: 1; padding: 10px;
+      background: transparent; border: none;
+      color: var(--text-sub); font-weight: 700; font-size: 14px;
+      border-radius: 8px; cursor: pointer; transition: all 0.2s;
+    }
+
+    .tab-btn.active { background: var(--accent); color: #fff; }
+
+    .form-step { display: none; }
+    .form-step.active { display: block; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #e2e8f0; }
+    .form-group input {
+      width: 100%; padding: 12px 14px;
+      background-color: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px; color: #fff; font-size: 14px; outline: none;
+    }
+    .form-group input:focus { border-color: var(--accent); }
+
+    .otp-input {
+      text-align: center; letter-spacing: 8px;
+      font-size: 22px !important; font-weight: bold; color: var(--accent) !important;
+    }
+
+    .btn-submit {
+      width: 100%; padding: 13px;
+      background-color: var(--accent); color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; margin-top: 10px;
+    }
+    .btn-submit:hover { background-color: var(--accent-hover); }
+
+    .btn-discord {
+      background-color: var(--discord-color);
+      color: #fff;
+    }
+    .btn-discord:hover { background-color: var(--discord-hover); }
+
+    .btn-danger { background-color: #ef4444; margin-top: 10px; }
+    .btn-danger:hover { background-color: #dc2626; }
+
+    .btn-secondary {
+      background: transparent; border: 1px solid var(--border-color);
+      color: var(--text-sub); padding: 10px; width: 100%;
+      border-radius: 8px; font-size: 13px; margin-top: 10px; cursor: pointer;
+    }
+
+    .dashboard-card {
+      background-color: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px; padding: 20px;
+      margin-bottom: 15px; text-align: center;
+    }
+
+    .player-code-box {
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px dashed #3b82f6;
+      color: #60a5fa;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      display: inline-block;
+      margin: 10px 0;
+    }
+
+    .status-badge {
+      display: inline-block;
+      background-color: rgba(16, 185, 129, 0.2);
+      color: var(--accent); border: 1px solid var(--accent);
+      padding: 4px 14px; border-radius: 20px;
+      font-size: 13px; font-weight: bold; margin-bottom: 12px;
+    }
+
+    .server-info {
+      display: flex; flex-direction: column; gap: 10px;
+      margin-top: 15px; text-align: right;
+    }
+
+    .info-item {
+      display: flex; justify-content: space-between; align-items: center;
+      background: #0f172a; padding: 10px 12px; border-radius: 8px; font-size: 13px;
+    }
+
+    .copy-btn {
+      background-color: #3b82f6; color: #fff; border: none;
+      padding: 5px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: bold;
+    }
+
+    .spinner {
+      width: 18px; height: 18px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.8s linear infinite; display: none;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .alert {
+      padding: 12px; border-radius: 8px; font-size: 13px;
+      margin-top: 15px; display: none; text-align: center; font-weight: 600;
+    }
+    .alert-success { background: rgba(16, 185, 129, 0.15); border: 1px solid var(--accent); color: #34d399; }
+    .alert-error { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #f87171; }
+
+    .footer { margin-top: 20px; text-align: center; font-size: 12px; color: var(--text-sub); }
   </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body>
 
-  <div class="w-full max-w-3xl bg-zinc-900 border-2 red-border rounded-2xl p-6 shadow-2xl relative overflow-hidden">
-    <div class="absolute top-0 right-0 w-full h-2 red-bg"></div>
-
-    <!-- 1. التسجيل -->
-    <div id="step-register" class="space-y-4">
-      <h2 class="text-2xl font-bold text-center gold-text mb-6"><i class="fa-solid fa-user-plus ml-2"></i>تسجيل البيانات الشخصية</h2>
-      <div>
-        <label class="block mb-1 text-sm">اسمك داخل اللعبة (IGN):</label>
-        <input type="text" id="mc-name" class="w-full p-2.5 rounded-lg bg-zinc-800 border gold-border text-white focus:outline-none" placeholder="مثال: Player123">
-      </div>
-      <div>
-        <label class="block mb-1 text-sm">الاسم الثنائي الحقيقي:</label>
-        <input type="text" id="full-name" class="w-full p-2.5 rounded-lg bg-zinc-800 border gold-border text-white focus:outline-none" placeholder="مثال: أحمد محمد">
-      </div>
-      <div>
-        <label class="block mb-1 text-sm">السن:</label>
-        <input type="number" id="age" class="w-full p-2.5 rounded-lg bg-zinc-800 border gold-border text-white focus:outline-none" placeholder="يجب أن يكون 10 سنوات أو أكثر">
-      </div>
-      <div>
-        <label class="block mb-1 text-sm">البريد الإلكتروني أو رقم الهاتف:</label>
-        <input type="text" id="contact" class="w-full p-2.5 rounded-lg bg-zinc-800 border gold-border text-white focus:outline-none" placeholder="example@gmail.com / 01012345678">
-      </div>
-      <p id="reg-error" class="text-red-500 text-sm hidden"><i class="fa-solid fa-triangle-exclamation ml-1"></i>عذراً، يجب ملء كافة الحقول وتحديد السن 10 فما فوق!</p>
-      <button onclick="submitRegister()" class="w-full py-3 gold-bg font-bold rounded-lg mt-4 transition">الانتقال للتحقق من الوجه</button>
+  <div class="container">
+    <div class="header">
+      <h1>🎮 Falcon MC</h1>
+      <p id="subHeader">بوابة دخول الأعضاء والـ Whitelist</p>
     </div>
 
-    <!-- 2. الكاميرا والتحقق -->
-    <div id="step-verify" class="hidden space-y-4 text-center">
-      <h2 class="text-2xl font-bold gold-text"><i class="fa-solid fa-camera-retro ml-2"></i>التحقق الذكي من الوجه (AI)</h2>
-      <p id="camera-instruction" class="text-sm text-gray-300">الرجاء النظر للأمام والتقاط الصورة</p>
-      
-      <div class="relative w-64 h-64 mx-auto border-4 red-border rounded-xl overflow-hidden bg-black flex items-center justify-center">
-        <video id="webcam" autoplay playsinline class="w-full h-full object-cover"></video>
-        <div id="camera-error" class="hidden text-xs text-red-400 p-2 text-center">تعذر فتح الكاميرا، يمكنك التخطي المباشر.</div>
+    <!-- Step 1: Tabs -->
+    <div id="step1" class="form-step active">
+      <div class="tab-container">
+        <button type="button" class="tab-btn active" id="tabSignupBtn" onclick="switchTab('signup')">إنشاء حساب</button>
+        <button type="button" class="tab-btn" id="tabLoginBtn" onclick="switchTab('login')">تسجيل الدخول</button>
       </div>
 
-      <div class="flex justify-center gap-2 my-2">
-        <span id="angle-1" class="px-3 py-1 bg-zinc-800 text-xs rounded-md border border-gray-600">1. الأمام</span>
-        <span id="angle-2" class="px-3 py-1 bg-zinc-800 text-xs rounded-md border border-gray-600">2. اليسار</span>
-        <span id="angle-3" class="px-3 py-1 bg-zinc-800 text-xs rounded-md border border-gray-600">3. اليمين</span>
-        <span id="angle-4" class="px-3 py-1 bg-zinc-800 text-xs rounded-md border border-gray-600">4. الأعلى</span>
-      </div>
-
-      <button id="capture-btn" onclick="captureDirection()" class="w-full py-3 red-bg font-bold rounded-lg transition">التقاط الصورة</button>
-      <button id="skip-btn" onclick="saveAndRedirect()" class="w-full py-2 bg-zinc-800 hover:bg-zinc-700 text-gray-300 font-bold rounded-lg text-sm transition hidden">تخطي التحقق والدخول للوحة التحكم</button>
-      
-      <div id="ai-loading" class="hidden text-amber-400 font-bold animate-pulse"><i class="fa-solid fa-microchip ml-1"></i> جاري فحص الصور وتحديد العمر بواسطة الذكاء الاصطناعي...</div>
-    </div>
-
-    <!-- 3. Dashboard -->
-    <div id="step-dashboard" class="hidden space-y-6">
-      <div class="flex justify-between items-center border-b border-zinc-800 pb-4">
-        <div>
-          <h2 class="text-2xl font-bold gold-text" id="user-display">أهلاً بك</h2>
-          <span class="text-xs bg-green-950 text-green-400 px-3 py-1 rounded-full border border-green-700/50 inline-block mt-1">
-            <i class="fa-solid fa-circle-check ml-1"></i> الحساب مفعّل في الوايت لست
-          </span>
+      <form id="signupForm">
+        <div class="form-group">
+          <label for="ign">اسم اللاعب في اللعبة (IGN)</label>
+          <input type="text" id="ign" placeholder="مثال: SOKAR">
         </div>
-        <button onclick="logout()" class="px-3.5 py-2 bg-red-950/60 hover:bg-red-900 text-red-400 border border-red-700/50 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
-          <i class="fa-solid fa-right-from-bracket"></i>
-          <span>تسجيل الخروج</span>
+        <div class="form-group">
+          <label for="fullName">الاسم الحقيقي الثنائي</label>
+          <input type="text" id="fullName" placeholder="مثال: أحمد محمد">
+        </div>
+        <div class="form-group">
+          <label for="age">السن</label>
+          <input type="number" id="age" min="8" max="99" placeholder="مثال: 18">
+        </div>
+        <div class="form-group">
+          <label for="email">البريد الإلكتروني (Gmail)</label>
+          <input type="email" id="email" placeholder="example@gmail.com">
+        </div>
+        <button type="submit" id="sendOtpBtn1" class="btn-submit">
+          <span id="btnText1">إرسال رمز التحقق (OTP)</span>
+          <div id="btnSpinner1" class="spinner"></div>
+        </button>
+      </form>
+
+      <form id="loginForm" style="display: none;">
+        <div class="form-group">
+          <label for="loginEmail">البريد الإلكتروني المسجل (Gmail)</label>
+          <input type="email" id="loginEmail" placeholder="example@gmail.com">
+        </div>
+        <button type="submit" id="sendOtpBtn2" class="btn-submit">
+          <span id="btnText2">إرسال رمز الدخول (OTP)</span>
+          <div id="btnSpinner2" class="spinner"></div>
+        </button>
+      </form>
+    </div>
+
+    <!-- Step 2: OTP -->
+    <div id="step2" class="form-step">
+      <form id="otpForm">
+        <p style="text-align: center; color: #9ca3af; font-size: 13px; margin-bottom: 15px;">
+          تم إرسال الرمز إلى البريد:<br><strong id="userEmailDisplay" style="color: #10b981;"></strong>
+        </p>
+        <div class="form-group">
+          <label for="otpCode" style="text-align: center;">رمز التحقق (OTP)</label>
+          <input type="text" id="otpCode" class="otp-input" maxlength="6" placeholder="000000" autocomplete="off">
+        </div>
+        <button type="submit" id="verifyBtn" class="btn-submit">
+          <span id="btnText3">تأكيد الرمز والتأهيل</span>
+          <div id="btnSpinner3" class="spinner"></div>
+        </button>
+        <button type="button" class="btn-secondary" onclick="resetToStep1()">العودة للخلف</button>
+      </form>
+    </div>
+
+    <!-- Step 3: Dashboard -->
+    <div id="step3" class="form-step">
+      <div class="dashboard-card">
+        <div class="status-badge">مفعل رسمياً في الـ Whitelist ✅</div>
+        <h2 style="color: #fff; font-size: 18px;">أهلاً بك يا <span id="playerIgnDisplay" style="color: var(--accent);"></span> 🚀</h2>
+        
+        <!-- الكود الخاص باللاعب -->
+        <div class="player-code-box">
+          كود اللاعب الخاص بك: <span id="playerCodeDisplay">---</span>
+        </div>
+
+        <div class="server-info">
+          <div class="info-item">
+            <span>عنوان السيرفر (IP):</span>
+            <div>
+              <strong id="serverIpText" style="color: #10b981; margin-left: 6px;">sqrmc.aternos.me:19423</strong>
+              <button class="copy-btn" onclick="copyIp()">نسخ</button>
+            </div>
+          </div>
+          <div class="info-item">
+            <span>الإصدار:</span>
+            <strong style="color: #fff;">زي ما انت عايز</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- كارت سيرفر الديسكورد -->
+      <div class="dashboard-card" style="border-color: rgba(88, 101, 242, 0.4); margin-top: 10px;">
+        <h3 style="color: #fff; font-size: 15px; margin-bottom: 5px;">مجتمع الديسكورد الرسمى 💬</h3>
+        <p style="color: var(--text-sub); font-size: 12px; margin-bottom: 12px;">انضم للديسكورد لمتابعة التحديثات والفعاليات والتواصل مع اللاعبين.</p>
+        <button type="button" class="btn-submit btn-discord" onclick="window.open('https://discord.gg/K2D3Ydy9b', '_blank')">
+          الانضمام لسيرفر Discord 🚀
         </button>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="gui-card rounded-xl p-4 flex flex-col justify-between border-l-4 border-l-amber-500">
-          <div class="flex justify-between items-start mb-2">
-            <div>
-              <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">عنوان السيرفر (Server IP)</span>
-              <div class="text-lg font-mono font-bold text-white mt-1" id="server-ip">sqrmc.aternos.me:19423</div>
-            </div>
-            <span class="flex h-3 w-3 relative mt-1">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-            </span>
-          </div>
-          <button onclick="copyIP()" id="copy-btn" class="w-full mt-2 py-2 gold-bg font-bold rounded-lg text-sm transition flex items-center justify-center gap-2">
-            <i class="fa-regular fa-copy"></i>
-            <span>نسخ الـ IP</span>
-          </button>
-        </div>
-
-        <div class="gui-card rounded-xl p-4 flex flex-col justify-between border-l-4 border-l-indigo-500">
-          <div class="mb-2">
-            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">مجتمع السيرفر</span>
-            <div class="text-lg font-bold text-white mt-1 flex items-center gap-2">
-              <i class="fa-brands fa-discord text-indigo-400 text-xl"></i>
-              <span>سيرفر الديسكورد الرسمي</span>
-            </div>
-          </div>
-          <a href="https://discord.gg/ANpRUZ6m9n" target="_blank" class="w-full mt-2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-sm transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            <span>الانضمام للديسكورد</span>
-          </a>
-        </div>
-      </div>
-
-      <div class="gui-card rounded-xl p-5 border-t-2 red-border">
-        <h3 class="text-lg font-bold text-red-500 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-scale-balanced"></i>
-          <span>سجل المخالفات والقضايا</span>
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="bg-zinc-900/90 p-4 rounded-lg border border-zinc-800">
-            <h4 class="font-bold text-amber-400 mb-2 text-sm flex items-center gap-1.5">
-              <i class="fa-solid fa-triangle-exclamation"></i> المخالفات المسجلة
-            </h4>
-            <ul id="violations-list" class="text-sm space-y-2 text-gray-300">
-              <li class="text-green-400 text-xs flex items-center gap-1"><i class="fa-solid fa-shield-halved"></i> لا يوجد مخالفات مسجلة 🎉</li>
-            </ul>
-          </div>
-          <div class="bg-zinc-900/90 p-4 rounded-lg border border-zinc-800">
-            <h4 class="font-bold text-red-400 mb-2 text-sm flex items-center gap-1.5">
-              <i class="fa-solid fa-gavel"></i> القضايا النشطة
-            </h4>
-            <ul class="text-sm space-y-2 text-gray-300">
-              <li class="flex justify-between items-center text-xs bg-zinc-800/50 p-2 rounded">
-                <span>الحالة الجنائية:</span>
-                <span class="text-green-400 font-bold px-2 py-0.5 bg-green-950/80 rounded border border-green-800">سليم (نظيف)</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      <button type="button" class="btn-submit btn-danger" onclick="logout()">
+        تسجيل الخروج 🚪
+      </button>
     </div>
 
+    <div id="alertBox" class="alert"></div>
+
+    <div class="footer">جميع الحقوق محفوظة &copy; Falcon MC 2026</div>
   </div>
 
   <script>
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzsSCQFmO6H0QLZFwVs-khIxqEM0O-ZCFBQ0luKntAcg4trYoOImd2rrD1_LCjkUTkOnA/exec";
-    let userData = {};
-    let currentStep = 0;
-    const directions = ["النظر للأمام", "الالتفات لليسار", "الالتفات لليمين", "النظر للأعلى"];
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwWEhMPCOtmYF1lpg2LuqOgZcgdaLra5AAVvC1UcJQCptdLT3cqvzPVagFn5wq9WxYgOw/exec";
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const savedUser = localStorage.getItem('mc_user');
-      if (savedUser) {
-        userData = JSON.parse(savedUser);
+    let currentEmail = "";
+    let currentIgn = "";
+    let currentCode = "";
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedSession = JSON.parse(localStorage.getItem("falcon_session"));
+      if (savedSession && savedSession.isLoggedIn) {
+        currentEmail = savedSession.email;
+        currentIgn = savedSession.ign;
+        currentCode = savedSession.playerCode;
         showDashboard();
       }
     });
 
-    function submitRegister() {
-      const mcName = document.getElementById('mc-name').value.trim();
-      const fullName = document.getElementById('full-name').value.trim();
-      const age = parseInt(document.getElementById('age').value);
-      const contact = document.getElementById('contact').value.trim();
-      const err = document.getElementById('reg-error');
-
-      if (!mcName || !fullName || isNaN(age) || !contact || age < 10) {
-        err.classList.remove('hidden');
-        return;
+    function switchTab(tab) {
+      hideAlert();
+      if (tab === 'signup') {
+        document.getElementById("tabSignupBtn").classList.add("active");
+        document.getElementById("tabLoginBtn").classList.remove("active");
+        document.getElementById("signupForm").style.display = "block";
+        document.getElementById("loginForm").style.display = "none";
+      } else {
+        document.getElementById("tabLoginBtn").classList.add("active");
+        document.getElementById("tabSignupBtn").classList.remove("active");
+        document.getElementById("loginForm").style.display = "block";
+        document.getElementById("signupForm").style.display = "none";
       }
-
-      err.classList.add('hidden');
-      userData = { mcName, fullName, age, contact };
-
-      document.getElementById('step-register').classList.add('hidden');
-      document.getElementById('step-verify').classList.remove('hidden');
-      startCamera();
     }
 
-    async function startCamera() {
+    document.getElementById("signupForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      currentEmail = document.getElementById("email").value.trim();
+      currentIgn = document.getElementById("ign").value.trim();
+
+      if (!currentIgn || !currentEmail) return showAlert("يرجى ملء جميع الحقول.", "error");
+
+      sendOtpRequest({
+        action: "sendOtp",
+        ign: currentIgn,
+        fullName: document.getElementById("fullName").value.trim(),
+        age: document.getElementById("age").value.trim(),
+        email: currentEmail
+      }, "sendOtpBtn1", "btnText1", "btnSpinner1");
+    });
+
+    document.getElementById("loginForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      currentEmail = document.getElementById("loginEmail").value.trim();
+
+      if (!currentEmail) return showAlert("يرجى إدخال البريد الإلكتروني.", "error");
+
+      sendOtpRequest({
+        action: "sendOtp",
+        email: currentEmail,
+        isLogin: true
+      }, "sendOtpBtn2", "btnText2", "btnSpinner2");
+    });
+
+    async function sendOtpRequest(payload, btnId, textId, spinnerId) {
+      hideAlert();
+      const btn = document.getElementById(btnId);
+      const btnText = document.getElementById(textId);
+      const spinner = document.getElementById(spinnerId);
+
+      setLoading(btn, btnText, spinner, true, "جاري الإرسال...");
+
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        document.getElementById('webcam').srcObject = stream;
-      } catch (err) {
-        document.getElementById('webcam').classList.add('hidden');
-        document.getElementById('camera-error').classList.remove('hidden');
-        document.getElementById('skip-btn').classList.remove('hidden');
-      }
-    }
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
 
-    function captureDirection() {
-      currentStep++;
-      if (currentStep <= 4) {
-        document.getElementById(`angle-${currentStep}`).classList.add('gold-bg');
-        if (currentStep < 4) {
-          document.getElementById('camera-instruction').innerText = `الخطوة ${currentStep + 1}: ${directions[currentStep]}`;
+        if (result.status === "success") {
+          document.getElementById("userEmailDisplay").textContent = currentEmail;
+          showStep("step2");
+          showAlert("تم إرسال رمز التحقق إلى بريدك! 📧", "success");
+        } else {
+          showAlert(result.message || "حدث خطأ.", "error");
         }
-      }
-
-      if (currentStep === 4) {
-        document.getElementById('capture-btn').classList.add('hidden');
-        document.getElementById('ai-loading').classList.remove('hidden');
-
-        // مهلة أقصاها 2 ثانية ثم التحويل تلقائياً لضمان عدم التعليق
-        setTimeout(() => {
-          sendDataToGoogleSheets();
-        }, 2000);
+      } catch (err) {
+        showAlert("فشل في الاتصال بالسيرفر.", "error");
+      } finally {
+        setLoading(btn, btnText, spinner, false, "إرسال رمز التحقق (OTP)");
       }
     }
 
-    function sendDataToGoogleSheets() {
-      if (GOOGLE_SCRIPT_URL.includes("YOUR_SCRIPT_ID")) {
-        saveAndRedirect();
-        return;
-      }
-      
-      fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData)
-      }).finally(() => {
-        saveAndRedirect();
-      });
-    }
+    document.getElementById("otpForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      hideAlert();
 
-    function saveAndRedirect() {
-      localStorage.setItem('mc_user', JSON.stringify(userData));
-      showDashboard();
-    }
+      const verifyBtn = document.getElementById("verifyBtn");
+      const btnText3 = document.getElementById("btnText3");
+      const btnSpinner3 = document.getElementById("btnSpinner3");
+      const otpCode = document.getElementById("otpCode").value.trim();
+
+      setLoading(verifyBtn, btnText3, btnSpinner3, true, "جاري التحقق...");
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: "verifyOtp", email: currentEmail, otp: otpCode })
+        });
+        const result = await response.json();
+
+        if (result.status === "success") {
+          currentIgn = result.ign || currentIgn;
+          currentCode = result.playerCode || "N/A";
+
+          localStorage.setItem("falcon_session", JSON.stringify({
+            isLoggedIn: true,
+            email: currentEmail,
+            ign: currentIgn,
+            playerCode: currentCode
+          }));
+
+          showDashboard();
+          showAlert("تم تسجيل الدخول بنجاح! 🎉", "success");
+        } else {
+          showAlert(result.message || "الرمز غير صحيح.", "error");
+        }
+      } catch (err) {
+        showAlert("حدث خطأ أثناء التحقق.", "error");
+      } finally {
+        setLoading(verifyBtn, btnText3, btnSpinner3, false, "تأكيد الرمز والتأهيل");
+      }
+    });
 
     function showDashboard() {
-      document.getElementById('step-register').classList.add('hidden');
-      document.getElementById('step-verify').classList.add('hidden');
-      document.getElementById('step-dashboard').classList.remove('hidden');
-      document.getElementById('user-display').innerText = `أهلاً بك، ${userData.mcName}`;
-    }
-
-    function copyIP() {
-      const ip = document.getElementById('server-ip').innerText;
-      navigator.clipboard.writeText(ip).then(() => {
-        const btn = document.getElementById('copy-btn');
-        btn.innerHTML = `<i class="fa-solid fa-check"></i> <span>تم النسخ بنجاح!</span>`;
-        btn.classList.replace('gold-bg', 'bg-green-600');
-        btn.classList.add('text-white');
-        setTimeout(() => {
-          btn.innerHTML = `<i class="fa-regular fa-copy"></i> <span>نسخ الـ IP</span>`;
-          btn.classList.replace('bg-green-600', 'gold-bg');
-          btn.classList.remove('text-white');
-        }, 2000);
-      });
+      document.getElementById("playerIgnDisplay").textContent = currentIgn || "اللاعب";
+      document.getElementById("playerCodeDisplay").textContent = currentCode || "N/A";
+      showStep("step3");
     }
 
     function logout() {
-      localStorage.removeItem('mc_user');
-      location.reload();
+      localStorage.removeItem("falcon_session");
+      currentEmail = ""; currentIgn = ""; currentCode = "";
+      document.getElementById("signupForm").reset();
+      document.getElementById("loginForm").reset();
+      document.getElementById("otpForm").reset();
+      resetToStep1();
+      showAlert("تم تسجيل الخروج بنجاح.", "success");
     }
+
+    function showStep(stepId) {
+      document.querySelectorAll(".form-step").forEach(step => step.classList.remove("active"));
+      document.getElementById(stepId).classList.add("active");
+    }
+
+    function resetToStep1() {
+      showStep("step1");
+      hideAlert();
+    }
+
+    function copyIp() {
+      navigator.clipboard.writeText("falcon.site");
+      showAlert("تم نسخ الـ IP بنجاح!", "success");
+    }
+
+    function setLoading(btn, textSpan, spinner, isLoading, text) {
+      btn.disabled = isLoading;
+      textSpan.textContent = text;
+      spinner.style.display = isLoading ? "inline-block" : "none";
+    }
+
+    function showAlert(msg, type) {
+      const box = document.getElementById("alertBox");
+      box.textContent = msg;
+      box.className = "alert " + (type === "success" ? "alert-success" : "alert-error");
+      box.style.display = "block";
+    }
+
+    function hideAlert() {
+      document.getElementById("alertBox").style.display = "none";
+    }
+
+    // 🛡️ حظر F12 والزر الأيمن
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+      if (e.keyCode === 123 || 
+         (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
+         (e.ctrlKey && e.keyCode === 85)) {
+        e.preventDefault();
+        return false;
+      }
+    });
   </script>
 </body>
 </html>
