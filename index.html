@@ -279,8 +279,24 @@
         </div>
       </div>
 
+      <!-- قسم أخبار وتحديثات السيرفر -->
+      <div style="margin-top: 15px; text-align: right;">
+        <h3 style="color: #fff; font-size: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+          <span>📢</span> أخبار وتحديثات السيرفر
+        </h3>
+        <div id="newsContainer" style="display: flex; flex-direction: column; gap: 10px;"></div>
+      </div>
+
+      <!-- قسم السجل الجنائي والقضايا -->
+      <div style="margin-top: 20px; text-align: right;">
+        <h3 style="color: #fff; font-size: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+          <span>⚖️</span> السجل الجنائي والقضايا
+        </h3>
+        <div id="casesContainer" style="display: flex; flex-direction: column; gap: 10px;"></div>
+      </div>
+
       <!-- كارت سيرفر الديسكورد -->
-      <div class="dashboard-card" style="border-color: rgba(88, 101, 242, 0.4); margin-top: 10px;">
+      <div class="dashboard-card" style="border-color: rgba(88, 101, 242, 0.4); margin-top: 20px;">
         <h3 style="color: #fff; font-size: 15px; margin-bottom: 5px;">مجتمع الديسكورد الرسمى 💬</h3>
         <p style="color: var(--text-sub); font-size: 12px; margin-bottom: 12px;">انضم للديسكورد لمتابعة التحديثات والفعاليات والتواصل مع اللاعبين.</p>
         <button type="button" class="btn-submit btn-discord" onclick="window.open('https://discord.gg/K2D3Ydy9b', '_blank')">
@@ -295,7 +311,7 @@
 
     <div id="alertBox" class="alert"></div>
 
-    <div class="footer">جميع الحقوق محفوظة &copy; Falcon MC , SOKAR WEB DEV ©️ 2026</div>
+    <div class="footer">جميع الحقوق محفوظة &copy; Falcons MC , SOKAR DEV 2026</div>
   </div>
 
   <script>
@@ -419,7 +435,7 @@
             playerCode: currentCode
           }));
 
-          showDashboard();
+          showDashboard(result.news, result.cases);
           showAlert("تم تسجيل الدخول بنجاح! 🎉", "success");
         } else {
           showAlert(result.message || "الرمز غير صحيح.", "error");
@@ -431,10 +447,74 @@
       }
     });
 
-    function showDashboard() {
+    function showDashboard(newsData, casesData) {
       document.getElementById("playerIgnDisplay").textContent = currentIgn || "اللاعب";
       document.getElementById("playerCodeDisplay").textContent = currentCode || "N/A";
       showStep("step3");
+
+      if (newsData && casesData) {
+        renderNews(newsData);
+        renderCases(casesData);
+      } else {
+        fetchDashboardData();
+      }
+    }
+
+    async function fetchDashboardData() {
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: "getDashboardData", email: currentEmail, playerCode: currentCode })
+        });
+        const result = await response.json();
+        if (result.status === "success") {
+          renderNews(result.news || []);
+          renderCases(result.cases || []);
+        }
+      } catch (e) {
+        console.error("خطأ في جلب بيانات لوحة التحكم:", e);
+      }
+    }
+
+    function renderNews(newsList) {
+      const container = document.getElementById("newsContainer");
+      if (!newsList || newsList.length === 0) {
+        container.innerHTML = `<div style="background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-sub); padding: 12px; border-radius: 8px; font-size: 12px; text-align: center;">لا توجد أخبار جديدة حالياً.</div>`;
+        return;
+      }
+      container.innerHTML = newsList.map(item => `
+        <div style="background: var(--input-bg); border: 1px solid var(--border-color); border-right: 4px solid var(--accent); padding: 12px 14px; border-radius: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="background: rgba(16, 185, 129, 0.2); color: var(--accent); font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: bold;">${item.badge || 'تحديث'}</span>
+            <span style="color: var(--text-sub); font-size: 11px;">${item.date || ''}</span>
+          </div>
+          <h4 style="color: #fff; font-size: 14px; margin-bottom: 4px;">${item.title || ''}</h4>
+          <p style="color: #cbd5e1; font-size: 12px; line-height: 1.5;">${item.content || ''}</p>
+        </div>
+      `).join('');
+    }
+
+    function renderCases(casesList) {
+      const container = document.getElementById("casesContainer");
+      if (!casesList || casesList.length === 0) {
+        container.innerHTML = `
+          <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent); color: #34d399; padding: 12px; border-radius: 8px; font-size: 12px; text-align: center; font-weight: 600;">
+            ✅ السجل الجنائي نظيف - لا توجد قضايا مسجلة ضد كودك.
+          </div>`;
+        return;
+      }
+      container.innerHTML = casesList.map(c => `
+        <div style="background: var(--input-bg); border: 1px solid var(--border-color); border-right: 4px solid #ef4444; padding: 12px 14px; border-radius: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="color: #f87171; font-weight: bold; font-size: 12px;">قضية ${c.caseNum || ''}</span>
+            <span style="background: rgba(239, 68, 68, 0.2); color: #ef4444; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: bold;">${c.status || 'قيد النظر'}</span>
+          </div>
+          <h4 style="color: #fff; font-size: 14px; margin-bottom: 4px;">${c.title || ''}</h4>
+          <p style="color: #cbd5e1; font-size: 12px; line-height: 1.5; margin-bottom: 6px;">${c.details || ''}</p>
+          <div style="color: #facc15; font-size: 12px;"><strong>العقوبة:</strong> ${c.penalty || 'لا يوجد'}</div>
+        </div>
+      `).join('');
     }
 
     function logout() {
