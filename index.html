@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Falcons MC - بوابة اللاعبين</title>
+  <title>Falcons MC - بوابة اللاعبين والشات</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
   <!-- مكتبة PeerJS للربط الحقيقي المباشر P2P للشات والمكالمات -->
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -163,7 +163,7 @@
 
     .copy-btn {
       background-color: #3b82f6; color: #fff; border: none;
-      padding: 5px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: bold;
+      padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: bold;
     }
 
     .spinner {
@@ -185,32 +185,17 @@
     .footer { margin-top: 20px; text-align: center; font-size: 12px; color: var(--text-sub); }
 
     /* =========================================
-       🍔 زر 3 الشرط + الشريط الجانبي + الشات الحقيقي
+       🍔 زر 3 الشرط + الشريط الجانبي
        ========================================= */
 
     .top-menu-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 1000;
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      width: 45px;
-      height: 45px;
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 5px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      position: fixed; top: 20px; right: 20px; z-index: 1000;
+      background: var(--card-bg); border: 1px solid var(--border-color);
+      width: 45px; height: 45px; border-radius: 12px;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      gap: 5px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
-    .top-menu-btn span {
-      width: 22px; height: 3px;
-      background-color: var(--accent);
-      border-radius: 2px;
-    }
+    .top-menu-btn span { width: 22px; height: 3px; background-color: var(--accent); border-radius: 2px; }
 
     .sidebar-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -238,7 +223,10 @@
     }
     .sidebar-item:hover { color: var(--accent); }
 
-    /* Modal الشات */
+    /* =========================================
+       💬 نظام الشات المتعدد المصمم كـ WhatsApp
+       ========================================= */
+
     .chat-modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(6px);
@@ -247,28 +235,29 @@
     .chat-modal-overlay.active { display: flex; }
 
     .chat-container {
-      width: 100%; max-width: 900px; height: 85vh;
+      width: 100%; max-width: 950px; height: 85vh;
       background: var(--card-bg); border: 1px solid var(--border-color);
       border-radius: 16px; display: flex; overflow: hidden; position: relative;
     }
 
+    /* القائمة الجانبية للمحادثات (Contacts List) */
     .chat-sidebar {
       width: 320px; background: var(--bg-color);
       border-left: 1px solid var(--border-color); display: flex; flex-direction: column;
     }
 
     .chat-user-profile {
-      padding: 16px; background: var(--input-bg);
+      padding: 14px 16px; background: var(--input-bg);
       border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px;
       position: relative;
     }
     .chat-avatar {
-      width: 48px; height: 48px; border-radius: 50%;
+      width: 44px; height: 44px; border-radius: 50%;
       object-fit: cover; border: 2px solid var(--accent); background: #334155;
     }
 
     .edit-profile-btn {
-      position: absolute; left: 12px; top: 18px;
+      position: absolute; left: 12px; top: 16px;
       background: transparent; border: none; color: var(--text-sub); cursor: pointer; font-size: 18px;
     }
 
@@ -281,18 +270,35 @@
       background: var(--accent); border: none; color: #fff; padding: 0 12px; border-radius: 8px; font-weight: bold; cursor: pointer;
     }
 
+    .contacts-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+    
+    .contact-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.2s;
+    }
+    .contact-item:hover { background: rgba(255,255,255,0.03); }
+    .contact-item.active { background: var(--input-bg); border-right: 4px solid var(--accent); }
+
+    .contact-item img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #334155; }
+    .contact-info { flex: 1; overflow: hidden; }
+    .contact-info h5 { color: #fff; font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .contact-info p { color: var(--text-sub); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+
+    /* منطقة الشات الرئيسي */
     .chat-main { flex: 1; display: flex; flex-direction: column; background: var(--card-bg); position: relative; }
+    
     .chat-header {
-      padding: 14px 20px; background: var(--input-bg);
+      padding: 12px 20px; background: var(--input-bg);
       border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;
     }
 
     .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+    
     .msg-bubble {
-      max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5; word-break: break-word;
+      max-width: 70%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5; word-break: break-word;
     }
-    .msg-incoming { align-self: flex-start; background: var(--input-bg); color: #fff; }
-    .msg-outgoing { align-self: flex-end; background: var(--accent); color: #fff; }
+    .msg-incoming { align-self: flex-start; background: var(--input-bg); color: #fff; border-bottom-right-radius: 2px; }
+    .msg-outgoing { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-left-radius: 2px; }
 
     .chat-input-area {
       padding: 14px 20px; background: var(--input-bg);
@@ -302,7 +308,7 @@
       flex: 1; padding: 12px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; color: #fff; outline: none;
     }
 
-    /* شاشة المكالمات الحقيقية (Video & Voice) */
+    /* 📞 شاشة المكالمات الحقيقية */
     .call-overlay {
       position: absolute; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(11, 15, 25, 0.95); z-index: 1100; display: none;
@@ -312,7 +318,7 @@
     .video-container { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; max-width: 500px; }
     video { width: 50%; height: 180px; background: #000; border-radius: 12px; border: 2px solid var(--border-color); object-fit: cover; }
 
-    /* تعديل البروفايل Modal */
+    /* ⚙️ تعديل البروفايل Modal */
     .edit-profile-modal {
       position: absolute; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(15, 23, 42, 0.98); z-index: 1080; display: none;
@@ -342,53 +348,58 @@
     <div class="sidebar-item" onclick="window.open('https://discord.gg/K2D3Ydy9b', '_blank'); closeSidebar();">🌐 سيرفر الديسكورد</div>
   </div>
 
-  <!-- 💬 نافذة الشات الحقيقي -->
+  <!-- 💬 نافذة الشات المتعدد (WhatsApp Style) -->
   <div class="chat-modal-overlay" id="chatModalOverlay">
     <div class="chat-container">
 
-      <!-- جانب البروفايل والأصدقاء -->
+      <!-- القائمة الجانبية: البروفايل + إضافة جهة اتصال + قائمة المحادثات -->
       <div class="chat-sidebar">
         <div class="chat-user-profile">
           <img id="myChatAvatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=SOKAR" class="chat-avatar">
           <div>
             <h4 id="myChatName" style="color: #fff; font-size: 14px;">لاعب Falcon</h4>
-            <p style="font-size: 10px; color: var(--accent);">رقمك الخاص: <strong id="myChatCode">جاري التجهيز...</strong></p>
+            <p style="font-size: 10px; color: var(--accent);">رقمك: <strong id="myChatCode">جاري التجهيز...</strong> <button class="copy-btn" style="padding: 1px 5px; font-size: 9px;" onclick="copyMyCode()">نسخ</button></p>
           </div>
           <button class="edit-profile-btn" onclick="toggleEditProfile(true)" title="تعديل البروفايل">⚙️</button>
         </div>
 
+        <!-- إضافة صديق -->
         <div class="add-contact-box">
-          <input type="text" id="peerIdInput" placeholder="أدخل رقم شخص للاتصال...">
-          <button onclick="connectToPeer()">ربط 🔗</button>
+          <input type="text" id="peerIdInput" placeholder="أدخل رقم Peer للصديق...">
+          <button onclick="addNewContact()">إضافة ➕</button>
         </div>
 
-        <div style="padding: 15px; color: var(--text-sub); font-size: 12px;" id="connectionStatus">
-          حالة الاتصال: <span style="color: #facc15;">في انتظار الاتصال بشخص...</span>
+        <!-- قائمة الأصدقاء والمحادثات -->
+        <div class="contacts-list" id="contactsListContainer">
+          <!-- يتم إدراج جهات الاتصال ديناميكياً هنا -->
         </div>
       </div>
 
-      <!-- منطقة المحادثة والمكالمة -->
+      <!-- منطقة المحادثة والمكالمات -->
       <div class="chat-main">
         <div class="chat-header">
-          <div>
-            <h4 id="activePeerName" style="color: #fff; font-size: 14px;">لم يتم الاتصال بأحد</h4>
-            <p id="activePeerId" style="font-size: 10px; color: var(--text-sub);">الرقم الخاص: ---</p>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <img id="activeContactAvatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=default" style="width:36px; height:36px; border-radius:50%; display:none;">
+            <div>
+              <h4 id="activePeerName" style="color: #fff; font-size: 14px;">اختر محادثة للبدء</h4>
+              <p id="activePeerId" style="font-size: 10px; color: var(--text-sub);">الرقم الخاص: ---</p>
+            </div>
           </div>
           <div style="display: flex; gap: 8px;">
-            <button class="copy-btn" style="background:#10b981;" onclick="startRealCall(false)">📞 ترن (صوت)</button>
+            <button class="copy-btn" style="background:#10b981;" onclick="startRealCall(false)">📞 اتصال صوتي</button>
             <button class="copy-btn" style="background:#3b82f6;" onclick="startRealCall(true)">📹 فيديو</button>
             <button class="copy-btn" style="background:#ef4444;" onclick="closeChatModal()">إغلاق ✕</button>
           </div>
         </div>
 
         <div class="chat-messages" id="chatMessages">
-          <div style="text-align: center; color: var(--text-sub); margin-top: 40px; font-size: 12px;">
-            مرحباً بك! أعطِ رقمك الخاص الموجود بالجانب لأي صديق ليكتب رقمك ويضغط "ربط" لتبدأوا شات ومكالمات حقيقية فوراً! 🚀
+          <div style="text-align: center; color: var(--text-sub); margin-top: 50px; font-size: 13px;">
+            اختر جهة اتصال من القائمة الجانبية أو أضف رقماً جديداً لتبدأ المحادثة والمكالمات! 🚀
           </div>
         </div>
 
         <div class="chat-input-area">
-          <input type="text" id="chatInput" placeholder="اكتب رسالة حقيقية هنا..." onkeydown="if(event.key==='Enter') sendRealMessage()">
+          <input type="text" id="chatInput" placeholder="اكتب رسالتك..." onkeydown="if(event.key==='Enter') sendRealMessage()">
           <button class="copy-btn" style="padding: 0 20px;" onclick="sendRealMessage()">إرسال 🚀</button>
         </div>
 
@@ -432,7 +443,7 @@
     </div>
   </div>
 
-  <!-- البوابة الرئيسية (الكود الأصلي) -->
+  <!-- البوابة الرئيسية -->
   <div class="container">
     <div class="header">
       <h1>🎮 Falcons MC</h1>
@@ -800,14 +811,20 @@
 
     function hideAlert() { document.getElementById("alertBox").style.display = "none"; }
 
-    /* =========================================
-       🔥 نظام الشات والمكالمات الحقيقي عبر PeerJS (WebRTC)
-       ========================================= */
+    /* =========================================================
+       🔥 نظام الشات والمكالمات المتعدد P2P (WhatsApp Architecture)
+       ========================================================= */
 
     let myPeer = null;
-    let activeConn = null;
+    let connections = {}; // { peerId: Peer.DataConnection }
     let activeCall = null;
     let localStream = null;
+
+    let activePeerId = null; // الشخص المفتوح الشات معه حالياً
+
+    // تخزين قائمة جهات الاتصال والمحادثات
+    let contacts = JSON.parse(localStorage.getItem("falcon_contacts")) || {}; 
+    let chatHistories = JSON.parse(localStorage.getItem("falcon_chats")) || {};
 
     let myProfile = {
       name: localStorage.getItem("falcon_chat_name") || "لاعب Falcon",
@@ -816,7 +833,6 @@
     };
 
     function initRealPeer() {
-      // توليد رقم فريد حقيقي لكل جهاز
       let savedPeerId = localStorage.getItem("falcon_real_peer_id");
       if (!savedPeerId) {
         savedPeerId = "fl-" + Math.floor(1000 + Math.random() * 9000);
@@ -829,25 +845,23 @@
       myPeer.on('open', (id) => {
         document.getElementById("myChatCode").textContent = id;
         updateProfileUI();
+        renderContactsList();
       });
 
-      // استقبال اتصال شات حقيقي من صديق
+      // استقبال اتصال جديد من أي شخص
       myPeer.on('connection', (conn) => {
-        activeConn = conn;
-        setupConnListeners();
-        document.getElementById("connectionStatus").innerHTML = `حالة الاتصال: <span style="color: var(--accent);">متصل برقم (${conn.peer}) 🟢</span>`;
-        document.getElementById("activePeerName").textContent = "صديق متصل";
-        document.getElementById("activePeerId").textContent = "الرقم الخاص: " + conn.peer;
+        setupConnection(conn);
       });
 
-      // استقبال مكالمة صوت/فيديو حقيقية من صديق
+      // استقبال مكالمة واردة
       myPeer.on('call', async (call) => {
-        if (confirm(`📞 مكالمة حقيقية واردة من (${call.peer})! هل تريد الرد؟`)) {
+        const callerName = contacts[call.peer]?.name || call.peer;
+        if (confirm(`📞 مكالمة واردة من (${callerName})! هل تريد الرد؟`)) {
           try {
             localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             document.getElementById("localVideo").srcObject = localStream;
             document.getElementById("callOverlay").classList.add("active");
-            document.getElementById("callStatusText").textContent = "متصل بمكالمة حقيقية 🟢";
+            document.getElementById("callStatusText").textContent = `متصل بمكالمة مع ${callerName} 🟢`;
 
             call.answer(localStream);
             activeCall = call;
@@ -862,37 +876,146 @@
       });
     }
 
-    function connectToPeer() {
-      const friendId = document.getElementById("peerIdInput").value.trim();
-      if (!friendId) return alert("يرجى إدخال الرقم الخاص بالشخص!");
-      if (friendId === myProfile.code) return alert("لا يمكنك الاتصال بنفسك!");
+    function setupConnection(conn) {
+      connections[conn.peer] = conn;
 
-      document.getElementById("connectionStatus").innerHTML = `حالة الاتصال: <span style="color: #facc15;">جاري الربط... ⏳</span>`;
-      
-      activeConn = myPeer.connect(friendId);
-      setupConnListeners();
-    }
-
-    function setupConnListeners() {
-      activeConn.on('open', () => {
-        document.getElementById("connectionStatus").innerHTML = `حالة الاتصال: <span style="color: var(--accent);">تم الاتصال بنجاح 🟢</span>`;
-        document.getElementById("activePeerName").textContent = "صديق متصل";
-        document.getElementById("activePeerId").textContent = "الرقم الخاص: " + activeConn.peer;
+      conn.on('open', () => {
+        // إنشاء جهة الاتصال إذا لم تكن موجودة
+        if (!contacts[conn.peer]) {
+          contacts[conn.peer] = {
+            id: conn.peer,
+            name: "لاعب " + conn.peer,
+            avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=" + conn.peer,
+            lastMsg: "تم الربط بنجاح"
+          };
+          saveContacts();
+        }
         
         // إرسال معلومات البروفايل للطرف الآخر
-        activeConn.send({ type: 'profile', name: myProfile.name, avatar: myProfile.avatar });
+        conn.send({ type: 'profile', name: myProfile.name, avatar: myProfile.avatar });
+        renderContactsList();
       });
 
-      activeConn.on('data', (data) => {
+      conn.on('data', (data) => {
         if (data.type === 'msg') {
-          appendMessage(data.text, 'incoming', data.senderName);
+          saveMessage(conn.peer, data.text, 'incoming', data.senderName);
+          if (activePeerId === conn.peer) {
+            appendMessageUI(data.text, 'incoming', data.senderName);
+          }
         } else if (data.type === 'profile') {
-          document.getElementById("activePeerName").textContent = data.name;
+          if (!contacts[conn.peer]) contacts[conn.peer] = { id: conn.peer };
+          contacts[conn.peer].name = data.name;
+          contacts[conn.peer].avatar = data.avatar;
+          saveContacts();
+          renderContactsList();
+          if (activePeerId === conn.peer) {
+            document.getElementById("activePeerName").textContent = data.name;
+            document.getElementById("activeContactAvatar").src = data.avatar;
+          }
         }
       });
 
-      activeConn.on('close', () => {
-        document.getElementById("connectionStatus").innerHTML = `حالة الاتصال: <span style="color: #ef4444;">تم قطع الاتصال 🔴</span>`;
+      conn.on('close', () => {
+        delete connections[conn.peer];
+        renderContactsList();
+      });
+    }
+
+    function addNewContact() {
+      const peerId = document.getElementById("peerIdInput").value.trim();
+      if (!peerId) return alert("يرجى إدخال الرقم الخاص بالشخص!");
+      if (peerId === myProfile.code) return alert("لا يمكنك إضافة نفسك!");
+
+      if (!contacts[peerId]) {
+        contacts[peerId] = {
+          id: peerId,
+          name: "صديق " + peerId,
+          avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=" + peerId,
+          lastMsg: "لم تبدأ المحادثة بعد"
+        };
+        saveContacts();
+      }
+
+      // محاولة ربط الاتصال فوراً
+      if (!connections[peerId] || !connections[peerId].open) {
+        const conn = myPeer.connect(peerId);
+        setupConnection(conn);
+      }
+
+      document.getElementById("peerIdInput").value = "";
+      renderContactsList();
+      selectContact(peerId);
+    }
+
+    function selectContact(peerId) {
+      activePeerId = peerId;
+      const contact = contacts[peerId];
+
+      document.getElementById("activePeerName").textContent = contact ? contact.name : peerId;
+      document.getElementById("activePeerId").textContent = "الرقم الخاص: " + peerId;
+      
+      const avatarImg = document.getElementById("activeContactAvatar");
+      avatarImg.src = contact ? contact.avatar : "https://api.dicebear.com/7.x/bottts/svg?seed=" + peerId;
+      avatarImg.style.display = "block";
+
+      // إذا لم يكن هناك اتصال مفتوح نحاول الربط تلقائياً
+      if (!connections[peerId] || !connections[peerId].open) {
+        const conn = myPeer.connect(peerId);
+        setupConnection(conn);
+      }
+
+      renderContactsList();
+      loadChatHistory(peerId);
+    }
+
+    function renderContactsList() {
+      const container = document.getElementById("contactsListContainer");
+      const list = Object.values(contacts);
+
+      if (list.length === 0) {
+        container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-sub); font-size: 12px;">لا توجد محادثات. أضف صديقاً باستخدام رقمه الخاص أعلاه!</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(c => {
+        const isConnected = connections[c.id] && connections[c.id].open;
+        const isActive = c.id === activePeerId;
+        return `
+          <div class="contact-item ${isActive ? 'active' : ''}" onclick="selectContact('${c.id}')">
+            <img src="${c.avatar}">
+            <div class="contact-info">
+              <h5>${c.name} ${isConnected ? '🟢' : '⚪'}</h5>
+              <p>${c.lastMsg || 'اضغط لبدء المحادثة'}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function saveMessage(peerId, text, type, sender) {
+      if (!chatHistories[peerId]) chatHistories[peerId] = [];
+      chatHistories[peerId].push({ text, type, sender, time: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) });
+      
+      if (contacts[peerId]) {
+        contacts[peerId].lastMsg = text;
+        saveContacts();
+      }
+      localStorage.setItem("falcon_chats", JSON.stringify(chatHistories));
+      renderContactsList();
+    }
+
+    function loadChatHistory(peerId) {
+      const container = document.getElementById("chatMessages");
+      container.innerHTML = "";
+
+      const history = chatHistories[peerId] || [];
+      if (history.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: var(--text-sub); margin-top: 40px; font-size: 12px;">أهلاً! ابدأ بكتابة رسالتك الأولى إلى هذا الصديق. 💬</div>`;
+        return;
+      }
+
+      history.forEach(msg => {
+        appendMessageUI(msg.text, msg.type, msg.sender);
       });
     }
 
@@ -900,15 +1023,30 @@
       const input = document.getElementById("chatInput");
       const text = input.value.trim();
       if (!text) return;
-      if (!activeConn || !activeConn.open) return alert("أنت غير متصل بأي صديق حالياً! أدخل رقمه واضغط ربط أولاً.");
+      if (!activePeerId) return alert("اختر جهة اتصال من القائمة أولاً!");
 
-      activeConn.send({ type: 'msg', text: text, senderName: myProfile.name });
-      appendMessage(text, 'outgoing', 'أنت');
+      const conn = connections[activePeerId];
+      if (!conn || !conn.open) {
+        alert("جاري إعادة الربط بالصديق... تأكد من أنه متصل بالإنترنت وفاتح للشات!");
+        const newConn = myPeer.connect(activePeerId);
+        setupConnection(newConn);
+        return;
+      }
+
+      conn.send({ type: 'msg', text: text, senderName: myProfile.name });
+      saveMessage(activePeerId, text, 'outgoing', 'أنت');
+      appendMessageUI(text, 'outgoing', 'أنت');
       input.value = "";
     }
 
-    function appendMessage(text, type, sender) {
+    function appendMessageUI(text, type, sender) {
       const container = document.getElementById("chatMessages");
+      
+      // مسح الرسالة الترحيبية إذا كانت موجودة
+      if (container.children.length === 1 && container.children[0].tagName === 'DIV' && container.children[0].style.textAlign === 'center') {
+        container.innerHTML = "";
+      }
+
       const bubble = document.createElement("div");
       bubble.className = `msg-bubble ${type === 'outgoing' ? 'msg-outgoing' : 'msg-incoming'}`;
       bubble.innerHTML = `<strong style="display:block; font-size:10px; opacity:0.8;">${sender}</strong>${text}`;
@@ -916,21 +1054,23 @@
       container.scrollTop = container.scrollHeight;
     }
 
-    /* 📞 بدء مكالمة صوت/فيديو حقيقية (WebRTC Stream) */
+    /* 📞 بدء مكالمة صوت/فيديو حقيقية */
     async function startRealCall(hasVideo) {
-      if (!activeConn || !activeConn.open) return alert("يجب أن تتصل بالصديق عبر الشات أولاً لتتمكن من رن/مكالمته!");
+      if (!activePeerId) return alert("اختر شخصاً من المحادثات أولاً للاتصال به!");
 
       try {
         localStream = await navigator.mediaDevices.getUserMedia({ video: hasVideo, audio: true });
         document.getElementById("localVideo").srcObject = localStream;
         document.getElementById("callOverlay").classList.add("active");
-        document.getElementById("callStatusText").textContent = "جاري الرن... 📲";
+        
+        const contactName = contacts[activePeerId]?.name || activePeerId;
+        document.getElementById("callStatusText").textContent = `جاري الرن على ${contactName}... 📲`;
 
-        const call = myPeer.call(activeConn.peer, localStream);
+        const call = myPeer.call(activePeerId, localStream);
         activeCall = call;
 
         call.on('stream', (remoteStream) => {
-          document.getElementById("callStatusText").textContent = "تم الرد - متصل الآن 🟢";
+          document.getElementById("callStatusText").textContent = `تم الرد - مكالمة متصلة 🟢`;
           document.getElementById("remoteVideo").srcObject = remoteStream;
         });
       } catch (e) {
@@ -944,7 +1084,16 @@
       document.getElementById("callOverlay").classList.remove("active");
     }
 
-    /* ⚙️ تغيير الصورة والاسم (ملف أو رابط) */
+    function saveContacts() {
+      localStorage.setItem("falcon_contacts", JSON.stringify(contacts));
+    }
+
+    function copyMyCode() {
+      navigator.clipboard.writeText(myProfile.code);
+      showAlert("تم نسخ رقم الـ Peer الخاص بك!", "success");
+    }
+
+    /* ⚙️ إعدادات البروفايل والشريط الجانبي */
     function toggleSidebar() {
       document.getElementById("sidebar").classList.toggle("active");
       document.getElementById("sidebarOverlay").classList.toggle("active");
@@ -994,12 +1143,14 @@
 
       updateProfileUI();
       toggleEditProfile(false);
-      showAlert("تم حفظ اسمك وصورتك بنجاح! ✨", "success");
+      showAlert("تم حفظ البيانات بنجاح! ✨", "success");
 
-      // تحديث الطرف الآخر إذا كنت متصلاً به
-      if (activeConn && activeConn.open) {
-        activeConn.send({ type: 'profile', name: myProfile.name, avatar: myProfile.avatar });
-      }
+      // إرسال التحديث لجميع المتصلين
+      Object.values(connections).forEach(conn => {
+        if (conn && conn.open) {
+          conn.send({ type: 'profile', name: myProfile.name, avatar: myProfile.avatar });
+        }
+      });
     }
 
     function updateProfileUI() {
