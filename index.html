@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Falcons MC - بوابة اللاعبين</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <!-- مكتبة PeerJS للربط الحقيقي المباشر P2P للشات والمكالمات -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+
   <style>
     :root {
       --bg-color: #0b0f19;
@@ -109,10 +112,7 @@
     }
     .btn-submit:hover { background-color: var(--accent-hover); }
 
-    .btn-discord {
-      background-color: var(--discord-color);
-      color: #fff;
-    }
+    .btn-discord { background-color: var(--discord-color); color: #fff; }
     .btn-discord:hover { background-color: var(--discord-hover); }
 
     .btn-danger { background-color: #ef4444; margin-top: 10px; }
@@ -183,10 +183,256 @@
     .alert-error { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #f87171; }
 
     .footer { margin-top: 20px; text-align: center; font-size: 12px; color: var(--text-sub); }
+
+    /* =========================================
+       🍔 زر 3 الشرط + الشريط الجانبي + الشات الحقيقي
+       ========================================= */
+
+    .top-menu-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      width: 45px;
+      height: 45px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .top-menu-btn span {
+      width: 22px; height: 3px;
+      background-color: var(--accent);
+      border-radius: 2px;
+    }
+
+    .sidebar-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px);
+      z-index: 1001; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+
+    .sidebar {
+      position: fixed; top: 0; right: -320px; width: 300px; height: 100%;
+      background: var(--card-bg); border-left: 1px solid var(--border-color);
+      z-index: 1002; transition: right 0.3s ease;
+      display: flex; flex-direction: column; padding: 25px 20px;
+    }
+    .sidebar.active { right: 0; }
+
+    .sidebar-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px;
+    }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+      background: var(--input-bg); border-radius: 10px; color: #fff;
+      font-weight: 700; cursor: pointer; margin-bottom: 10px;
+    }
+    .sidebar-item:hover { color: var(--accent); }
+
+    /* Modal الشات */
+    .chat-modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(6px);
+      z-index: 1050; display: none; justify-content: center; align-items: center; padding: 15px;
+    }
+    .chat-modal-overlay.active { display: flex; }
+
+    .chat-container {
+      width: 100%; max-width: 900px; height: 85vh;
+      background: var(--card-bg); border: 1px solid var(--border-color);
+      border-radius: 16px; display: flex; overflow: hidden; position: relative;
+    }
+
+    .chat-sidebar {
+      width: 320px; background: var(--bg-color);
+      border-left: 1px solid var(--border-color); display: flex; flex-direction: column;
+    }
+
+    .chat-user-profile {
+      padding: 16px; background: var(--input-bg);
+      border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px;
+      position: relative;
+    }
+    .chat-avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      object-fit: cover; border: 2px solid var(--accent); background: #334155;
+    }
+
+    .edit-profile-btn {
+      position: absolute; left: 12px; top: 18px;
+      background: transparent; border: none; color: var(--text-sub); cursor: pointer; font-size: 18px;
+    }
+
+    .add-contact-box { padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; gap: 8px; }
+    .add-contact-box input {
+      flex: 1; padding: 8px 12px; background: var(--input-bg);
+      border: 1px solid var(--border-color); border-radius: 8px; color: #fff; font-size: 12px; outline: none;
+    }
+    .add-contact-box button {
+      background: var(--accent); border: none; color: #fff; padding: 0 12px; border-radius: 8px; font-weight: bold; cursor: pointer;
+    }
+
+    .chat-main { flex: 1; display: flex; flex-direction: column; background: var(--card-bg); position: relative; }
+    .chat-header {
+      padding: 14px 20px; background: var(--input-bg);
+      border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+    .msg-bubble {
+      max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5; word-break: break-word;
+    }
+    .msg-incoming { align-self: flex-start; background: var(--input-bg); color: #fff; }
+    .msg-outgoing { align-self: flex-end; background: var(--accent); color: #fff; }
+
+    .chat-input-area {
+      padding: 14px 20px; background: var(--input-bg);
+      border-top: 1px solid var(--border-color); display: flex; gap: 10px;
+    }
+    .chat-input-area input {
+      flex: 1; padding: 12px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; color: #fff; outline: none;
+    }
+
+    /* شاشة المكالمات الحقيقية (Video & Voice) */
+    .call-overlay {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(11, 15, 25, 0.95); z-index: 1100; display: none;
+      flex-direction: column; justify-content: center; align-items: center; padding: 20px;
+    }
+    .call-overlay.active { display: flex; }
+    .video-container { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; max-width: 500px; }
+    video { width: 50%; height: 180px; background: #000; border-radius: 12px; border: 2px solid var(--border-color); object-fit: cover; }
+
+    /* تعديل البروفايل Modal */
+    .edit-profile-modal {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.98); z-index: 1080; display: none;
+      flex-direction: column; padding: 25px; justify-content: center;
+    }
+    .edit-profile-modal.active { display: flex; }
+    .avatar-preview { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--accent); margin: 0 auto 15px auto; display: block; object-fit: cover; }
   </style>
 </head>
 <body>
 
+  <!-- 🍔 زر الـ 3 شرط -->
+  <button class="top-menu-btn" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </button>
+
+  <!-- 📂 الشريط الجانبي -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h2>🦅 Falcons MC</h2>
+      <button style="background:none; border:none; color:#fff; font-size:20px; cursor:pointer;" onclick="closeSidebar()">✕</button>
+    </div>
+    <div class="sidebar-item" onclick="closeSidebar()">🏠 الصفحة الرئيسية</div>
+    <div class="sidebar-item" onclick="openChatModal(); closeSidebar();">💬 شات Falcons الحقيقي</div>
+    <div class="sidebar-item" onclick="copyIp(); closeSidebar();">🎮 نسخ IP السيرفر</div>
+    <div class="sidebar-item" onclick="window.open('https://discord.gg/K2D3Ydy9b', '_blank'); closeSidebar();">🌐 سيرفر الديسكورد</div>
+  </div>
+
+  <!-- 💬 نافذة الشات الحقيقي -->
+  <div class="chat-modal-overlay" id="chatModalOverlay">
+    <div class="chat-container">
+
+      <!-- جانب البروفايل والأصدقاء -->
+      <div class="chat-sidebar">
+        <div class="chat-user-profile">
+          <img id="myChatAvatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=SOKAR" class="chat-avatar">
+          <div>
+            <h4 id="myChatName" style="color: #fff; font-size: 14px;">لاعب Falcon</h4>
+            <p style="font-size: 10px; color: var(--accent);">رقمك الخاص: <strong id="myChatCode">جاري التجهيز...</strong></p>
+          </div>
+          <button class="edit-profile-btn" onclick="toggleEditProfile(true)" title="تعديل البروفايل">⚙️</button>
+        </div>
+
+        <div class="add-contact-box">
+          <input type="text" id="peerIdInput" placeholder="أدخل رقم شخص للاتصال...">
+          <button onclick="connectToPeer()">ربط 🔗</button>
+        </div>
+
+        <div style="padding: 15px; color: var(--text-sub); font-size: 12px;" id="connectionStatus">
+          حالة الاتصال: <span style="color: #facc15;">في انتظار الاتصال بشخص...</span>
+        </div>
+      </div>
+
+      <!-- منطقة المحادثة والمكالمة -->
+      <div class="chat-main">
+        <div class="chat-header">
+          <div>
+            <h4 id="activePeerName" style="color: #fff; font-size: 14px;">لم يتم الاتصال بأحد</h4>
+            <p id="activePeerId" style="font-size: 10px; color: var(--text-sub);">الرقم الخاص: ---</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="copy-btn" style="background:#10b981;" onclick="startRealCall(false)">📞 ترن (صوت)</button>
+            <button class="copy-btn" style="background:#3b82f6;" onclick="startRealCall(true)">📹 فيديو</button>
+            <button class="copy-btn" style="background:#ef4444;" onclick="closeChatModal()">إغلاق ✕</button>
+          </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+          <div style="text-align: center; color: var(--text-sub); margin-top: 40px; font-size: 12px;">
+            مرحباً بك! أعطِ رقمك الخاص الموجود بالجانب لأي صديق ليكتب رقمك ويضغط "ربط" لتبدأوا شات ومكالمات حقيقية فوراً! 🚀
+          </div>
+        </div>
+
+        <div class="chat-input-area">
+          <input type="text" id="chatInput" placeholder="اكتب رسالة حقيقية هنا..." onkeydown="if(event.key==='Enter') sendRealMessage()">
+          <button class="copy-btn" style="padding: 0 20px;" onclick="sendRealMessage()">إرسال 🚀</button>
+        </div>
+
+        <!-- 📞 شاشة الاتصال والمكالمة الحقيقية -->
+        <div class="call-overlay" id="callOverlay">
+          <h3 style="color:#fff; margin-bottom: 10px;" id="callStatusText">جاري الاتصال... 📲</h3>
+          <div class="video-container">
+            <video id="localVideo" autoplay playsinline muted title="كاميرتك"></video>
+            <video id="remoteVideo" autoplay playsinline title="كاميرا الصديق"></video>
+          </div>
+          <button class="btn-submit btn-danger" style="width: auto; padding: 10px 30px;" onclick="endCall()">إنهاء المكالمة ❌</button>
+        </div>
+
+        <!-- ⚙️ شاشة تعديل الصورة والاسم -->
+        <div class="edit-profile-modal" id="editProfileModal">
+          <h3 style="color: #fff; margin-bottom: 15px; text-align: center;">⚙️ تعديل اسمك وصورتك الشخصية</h3>
+          
+          <img id="avatarPreview" src="https://api.dicebear.com/7.x/bottts/svg?seed=SOKAR" class="avatar-preview">
+
+          <div class="form-group">
+            <label>اختر صورة من جهازك:</label>
+            <input type="file" id="avatarFileInput" accept="image/*" onchange="handleFileSelect(event)" style="padding: 6px;">
+          </div>
+
+          <div class="form-group">
+            <label>أو ضع رابط صورة مباشر:</label>
+            <input type="text" id="editAvatarUrl" placeholder="https://..." oninput="document.getElementById('avatarPreview').src = this.value">
+          </div>
+
+          <div class="form-group">
+            <label>الاسم الظاهر:</label>
+            <input type="text" id="editNameInput" placeholder="اسمك">
+          </div>
+
+          <button class="btn-submit" onclick="saveProfileChanges()">حفظ التعديلات ✅</button>
+          <button class="btn-secondary" onclick="toggleEditProfile(false)">إلغاء</button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- البوابة الرئيسية (الكود الأصلي) -->
   <div class="container">
     <div class="header">
       <h1>🎮 Falcons MC</h1>
@@ -259,7 +505,6 @@
         <div class="status-badge">مفعل رسمياً في الـ Whitelist ✅</div>
         <h2 style="color: #fff; font-size: 18px;">أهلاً بك يا <span id="playerIgnDisplay" style="color: var(--accent);"></span> 🚀</h2>
         
-        <!-- الكود الخاص باللاعب -->
         <div class="player-code-box">
           كود اللاعب الخاص بك: <span id="playerCodeDisplay">---</span>
         </div>
@@ -279,7 +524,7 @@
         </div>
       </div>
 
-      <!-- قسم أخبار وتحديثات السيرفر -->
+      <!-- أخبار السيرفر -->
       <div style="margin-top: 15px; text-align: right;">
         <h3 style="color: #fff; font-size: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
           <span>📢</span> أخبار وتحديثات السيرفر
@@ -287,7 +532,7 @@
         <div id="newsContainer" style="display: flex; flex-direction: column; gap: 10px;"></div>
       </div>
 
-      <!-- قسم السجل الجنائي والقضايا -->
+      <!-- القضايا -->
       <div style="margin-top: 20px; text-align: right;">
         <h3 style="color: #fff; font-size: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
           <span>⚖️</span> السجل الجنائي والقضايا
@@ -295,7 +540,7 @@
         <div id="casesContainer" style="display: flex; flex-direction: column; gap: 10px;"></div>
       </div>
 
-      <!-- كارت سيرفر الديسكورد -->
+      <!-- كارت الديسكورد -->
       <div class="dashboard-card" style="border-color: rgba(88, 101, 242, 0.4); margin-top: 20px;">
         <h3 style="color: #fff; font-size: 15px; margin-bottom: 5px;">مجتمع الديسكورد الرسمى 💬</h3>
         <p style="color: var(--text-sub); font-size: 12px; margin-bottom: 12px;">انضم للديسكورد لمتابعة التحديثات والفعاليات والتواصل مع اللاعبين.</p>
@@ -310,7 +555,6 @@
     </div>
 
     <div id="alertBox" class="alert"></div>
-
     <div class="footer">جميع الحقوق محفوظة &copy; Falcons MC , SOKAR DEV 2026</div>
   </div>
 
@@ -329,6 +573,7 @@
         currentCode = savedSession.playerCode;
         showDashboard();
       }
+      initRealPeer();
     });
 
     function switchTab(tab) {
@@ -458,6 +703,11 @@
       } else {
         fetchDashboardData();
       }
+
+      if (currentIgn) {
+        myProfile.name = currentIgn;
+        updateProfileUI();
+      }
     }
 
     async function fetchDashboardData() {
@@ -473,7 +723,7 @@
           renderCases(result.cases || []);
         }
       } catch (e) {
-        console.error("خطأ في جلب بيانات لوحة التحكم:", e);
+        console.error("خطأ في جلب البيانات:", e);
       }
     }
 
@@ -532,15 +782,8 @@
       document.getElementById(stepId).classList.add("active");
     }
 
-    function resetToStep1() {
-      showStep("step1");
-      hideAlert();
-    }
-
-    function copyIp() {
-      navigator.clipboard.writeText("sqrmc.aternos.me:19423");
-      showAlert("تم نسخ الـ IP بنجاح!", "success");
-    }
+    function resetToStep1() { showStep("step1"); hideAlert(); }
+    function copyIp() { navigator.clipboard.writeText("sqrmc.aternos.me:19423"); showAlert("تم نسخ الـ IP بنجاح!", "success"); }
 
     function setLoading(btn, textSpan, spinner, isLoading, text) {
       btn.disabled = isLoading;
@@ -555,8 +798,213 @@
       box.style.display = "block";
     }
 
-    function hideAlert() {
-      document.getElementById("alertBox").style.display = "none";
+    function hideAlert() { document.getElementById("alertBox").style.display = "none"; }
+
+    /* =========================================
+       🔥 نظام الشات والمكالمات الحقيقي عبر PeerJS (WebRTC)
+       ========================================= */
+
+    let myPeer = null;
+    let activeConn = null;
+    let activeCall = null;
+    let localStream = null;
+
+    let myProfile = {
+      name: localStorage.getItem("falcon_chat_name") || "لاعب Falcon",
+      avatar: localStorage.getItem("falcon_chat_avatar") || "https://api.dicebear.com/7.x/bottts/svg?seed=" + Math.random(),
+      code: ""
+    };
+
+    function initRealPeer() {
+      // توليد رقم فريد حقيقي لكل جهاز
+      let savedPeerId = localStorage.getItem("falcon_real_peer_id");
+      if (!savedPeerId) {
+        savedPeerId = "fl-" + Math.floor(1000 + Math.random() * 9000);
+        localStorage.setItem("falcon_real_peer_id", savedPeerId);
+      }
+      myProfile.code = savedPeerId;
+
+      myPeer = new Peer(savedPeerId);
+
+      myPeer.on('open', (id) => {
+        document.getElementById("myChatCode").textContent = id;
+        updateProfileUI();
+      });
+
+      // استقبال اتصال شات حقيقي من صديق
+      myPeer.on('connection', (conn) => {
+        activeConn = conn;
+        setupConnListeners();
+        document.getElementById("connectionStatus").innerHTML = `حالة الاتصال: <span style="color: var(--accent);">متصل برقم (${conn.peer}) 🟢</span>`;
+        document.getElementById("activePeerName").textContent = "صديق متصل";
+        document.getElementById("activePeerId").textContent = "الرقم الخاص: " + conn.peer;
+      });
+
+      // استقبال مكالمة صوت/فيديو حقيقية من صديق
+      myPeer.on('call', async (call) => {
+        if (confirm(`📞 مكالمة حقيقية واردة من (${call.peer})! هل تريد الرد؟`)) {
+          try {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            document.getElementById("localVideo").srcObject = localStream;
+            document.getElementById("callOverlay").classList.add("active");
+            document.getElementById("callStatusText").textContent = "متصل بمكالمة حقيقية 🟢";
+
+            call.answer(localStream);
+            activeCall = call;
+
+            call.on('stream', (remoteStream) => {
+              document.getElementById("remoteVideo").srcObject = remoteStream;
+            });
+          } catch (err) {
+            alert("تعذر الوصول للكاميرا والميكروفون!");
+          }
+        }
+      });
+    }
+
+    function connectToPeer() {
+      const friendId = document.getElementById("peerIdInput").value.trim();
+      if (!friendId) return alert("يرجى إدخال الرقم الخاص بالشخص!");
+      if (friendId === myProfile.code) return alert("لا يمكنك الاتصال بنفسك!");
+
+      document.getElementById("connectionStatus").innerHTML = `حالة الاتصال: <span style="color: #facc15;">جاري الربط... ⏳</span>`;
+      
+      activeConn = myPeer.connect(friendId);
+      setupConnListeners();
+    }
+
+    function setupConnListeners() {
+      activeConn.on('open', () => {
+        document.getElementById("connectionStatus").innerHTML = `حالة الاتصال: <span style="color: var(--accent);">تم الاتصال بنجاح 🟢</span>`;
+        document.getElementById("activePeerName").textContent = "صديق متصل";
+        document.getElementById("activePeerId").textContent = "الرقم الخاص: " + activeConn.peer;
+        
+        // إرسال معلومات البروفايل للطرف الآخر
+        activeConn.send({ type: 'profile', name: myProfile.name, avatar: myProfile.avatar });
+      });
+
+      activeConn.on('data', (data) => {
+        if (data.type === 'msg') {
+          appendMessage(data.text, 'incoming', data.senderName);
+        } else if (data.type === 'profile') {
+          document.getElementById("activePeerName").textContent = data.name;
+        }
+      });
+
+      activeConn.on('close', () => {
+        document.getElementById("connectionStatus").innerHTML = `حالة الاتصال: <span style="color: #ef4444;">تم قطع الاتصال 🔴</span>`;
+      });
+    }
+
+    function sendRealMessage() {
+      const input = document.getElementById("chatInput");
+      const text = input.value.trim();
+      if (!text) return;
+      if (!activeConn || !activeConn.open) return alert("أنت غير متصل بأي صديق حالياً! أدخل رقمه واضغط ربط أولاً.");
+
+      activeConn.send({ type: 'msg', text: text, senderName: myProfile.name });
+      appendMessage(text, 'outgoing', 'أنت');
+      input.value = "";
+    }
+
+    function appendMessage(text, type, sender) {
+      const container = document.getElementById("chatMessages");
+      const bubble = document.createElement("div");
+      bubble.className = `msg-bubble ${type === 'outgoing' ? 'msg-outgoing' : 'msg-incoming'}`;
+      bubble.innerHTML = `<strong style="display:block; font-size:10px; opacity:0.8;">${sender}</strong>${text}`;
+      container.appendChild(bubble);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    /* 📞 بدء مكالمة صوت/فيديو حقيقية (WebRTC Stream) */
+    async function startRealCall(hasVideo) {
+      if (!activeConn || !activeConn.open) return alert("يجب أن تتصل بالصديق عبر الشات أولاً لتتمكن من رن/مكالمته!");
+
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({ video: hasVideo, audio: true });
+        document.getElementById("localVideo").srcObject = localStream;
+        document.getElementById("callOverlay").classList.add("active");
+        document.getElementById("callStatusText").textContent = "جاري الرن... 📲";
+
+        const call = myPeer.call(activeConn.peer, localStream);
+        activeCall = call;
+
+        call.on('stream', (remoteStream) => {
+          document.getElementById("callStatusText").textContent = "تم الرد - متصل الآن 🟢";
+          document.getElementById("remoteVideo").srcObject = remoteStream;
+        });
+      } catch (e) {
+        alert("تأكد من السماح بإذن الكاميرا والميكروفون في متصفحك!");
+      }
+    }
+
+    function endCall() {
+      if (activeCall) activeCall.close();
+      if (localStream) localStream.getTracks().forEach(track => track.stop());
+      document.getElementById("callOverlay").classList.remove("active");
+    }
+
+    /* ⚙️ تغيير الصورة والاسم (ملف أو رابط) */
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("active");
+      document.getElementById("sidebarOverlay").classList.toggle("active");
+    }
+    function closeSidebar() {
+      document.getElementById("sidebar").classList.remove("active");
+      document.getElementById("sidebarOverlay").classList.remove("active");
+    }
+
+    function openChatModal() { document.getElementById("chatModalOverlay").classList.add("active"); }
+    function closeChatModal() { document.getElementById("chatModalOverlay").classList.remove("active"); }
+
+    function toggleEditProfile(show) {
+      const modal = document.getElementById("editProfileModal");
+      if (show) {
+        document.getElementById("editNameInput").value = myProfile.name;
+        document.getElementById("editAvatarUrl").value = myProfile.avatar;
+        document.getElementById("avatarPreview").src = myProfile.avatar;
+        modal.classList.add("active");
+      } else {
+        modal.classList.remove("active");
+      }
+    }
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const base64Image = e.target.result;
+          document.getElementById("avatarPreview").src = base64Image;
+          document.getElementById("editAvatarUrl").value = base64Image;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function saveProfileChanges() {
+      const newName = document.getElementById("editNameInput").value.trim();
+      const newAvatar = document.getElementById("editAvatarUrl").value.trim();
+
+      if (newName) myProfile.name = newName;
+      if (newAvatar) myProfile.avatar = newAvatar;
+
+      localStorage.setItem("falcon_chat_name", myProfile.name);
+      localStorage.setItem("falcon_chat_avatar", myProfile.avatar);
+
+      updateProfileUI();
+      toggleEditProfile(false);
+      showAlert("تم حفظ اسمك وصورتك بنجاح! ✨", "success");
+
+      // تحديث الطرف الآخر إذا كنت متصلاً به
+      if (activeConn && activeConn.open) {
+        activeConn.send({ type: 'profile', name: myProfile.name, avatar: myProfile.avatar });
+      }
+    }
+
+    function updateProfileUI() {
+      document.getElementById("myChatName").textContent = myProfile.name;
+      document.getElementById("myChatAvatar").src = myProfile.avatar;
     }
 
     // 🛡️ حظر F12 والزر الأيمن
