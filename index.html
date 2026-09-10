@@ -59,7 +59,7 @@
 
 <div class="container">
   
-  <!-- نموذج تسجيل الدخول وإنشاء الحساب -->
+  <!-- تسجيل الدخول وإنشاء الحساب -->
   <div id="authContainer" class="card">
     <h1 class="brand-title">🎮 Falcon MC</h1>
     
@@ -70,7 +70,7 @@
 
     <div id="alertMsg" class="alert hidden"></div>
 
-    <!-- 1. نموذج إرسال الـ OTP -->
+    <!-- 1. نموذج طلب الـ OTP -->
     <form id="otpReqForm" onsubmit="handleSendOtp(event)">
       <div id="signupFields">
         <div class="form-group">
@@ -116,15 +116,10 @@
       <button class="btn btn-secondary" style="width: auto; padding: 5px 15px; font-size: 0.85rem;" onclick="logout()">خروج</button>
     </h2>
 
-    <!-- بيانات الحساب المربوطة -->
     <div class="profile-grid">
       <div class="info-box">
         <span>كود اللاعب</span>
         <strong id="dashPlayerCode">---</strong>
-      </div>
-      <div class="info-box">
-        <span>الرقم الوهمي المربوط</span>
-        <strong id="dashVirtualPhone" style="color: var(--primary);">---</strong>
       </div>
       <div class="info-box">
         <span>البريد الإلكتروني</span>
@@ -132,13 +127,13 @@
       </div>
     </div>
 
-    <!-- قسم الأخبار والإعلانات -->
+    <!-- الأخبار والإعلانات -->
     <div class="section-box">
       <h3>📢 آخر الأخبار والإعلانات</h3>
       <div id="newsList">لا توجد أخبار حالياً.</div>
     </div>
 
-    <!-- قسم القضايا والسجلات -->
+    <!-- القضايا والسجلات -->
     <div class="section-box">
       <h3>⚖️ سجل القضايا الخاص بك</h3>
       <div id="casesList">لا توجد قضايا مسجلة باسمك.</div>
@@ -148,8 +143,7 @@
 </div>
 
 <script>
-  // ضع رابط الـ Web App الخاص بك هنا من Google Apps Script
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5m-1Llz_yWVK0Il8DwVY0mHTlI_9FoIi9swJD4B3xgsDelAPhpekC2yZKr23zjuAPeQ/exec";
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxnphtNUkaX2silg0lMcXSi3Gi5YMMXNJ32ncHekfxWhAKi-4E2m1FVeBUQYpBA32ISxw/exec";
 
   let isLoginMode = false;
   let currentEmail = "";
@@ -225,7 +219,7 @@
     } catch (err) {
       btn.disabled = false;
       btn.innerText = "إرسال رمز التحقق (OTP)";
-      showAlert("فشل الاتصال بالسيرفر. تحقق من الرابط ورابط الانترنت.");
+      showAlert("فشل الاتصال بالسيرفر.");
     }
   }
 
@@ -253,12 +247,10 @@
       btn.innerText = "تأكيد والدخول";
 
       if (data.status === "success") {
-        // حفظ بيانات الجلسة ورقم التليفون الوهمي في LocalStorage
         localStorage.setItem("falcon_user", JSON.stringify({
           email: currentEmail,
           ign: data.ign,
-          playerCode: data.playerCode,
-          virtualPhone: data.virtualPhone
+          playerCode: data.playerCode
         }));
 
         loadDashboard(data);
@@ -278,15 +270,8 @@
 
     document.getElementById("dashIgn").innerText = data.ign || "لاعب";
     document.getElementById("dashPlayerCode").innerText = data.playerCode || "---";
-    document.getElementById("dashVirtualPhone").innerText = data.virtualPhone || "---";
     document.getElementById("dashEmail").innerText = currentEmail;
 
-    // حفظ الرقم الوهمي للشات (مثل PeerJS)
-    if (data.virtualPhone) {
-      localStorage.setItem("falcon_real_peer_id", data.virtualPhone);
-    }
-
-    // عرض الأخبار
     const newsBox = document.getElementById("newsList");
     if (data.news && data.news.length > 0) {
       newsBox.innerHTML = data.news.map(item => `
@@ -294,6 +279,7 @@
           <span class="badge">${item.badge}</span>
           <strong style="display:block; margin: 2px 0;">${item.title}</strong>
           <p style="font-size:0.9rem; color:var(--text-muted);">${item.content}</p>
+
           <small style="color:#64748b; display:block; margin-top:5px;">${item.date}</small>
         </div>
       `).join("");
@@ -301,7 +287,6 @@
       newsBox.innerHTML = "<p style='color:var(--text-muted);'>لا توجد أخبار جديدة.</p>";
     }
 
-    // عرض القضايا
     const casesBox = document.getElementById("casesList");
     if (data.cases && data.cases.length > 0) {
       casesBox.innerHTML = data.cases.map(c => `
@@ -351,7 +336,6 @@
 
   function logout() {
     localStorage.removeItem("falcon_user");
-    localStorage.removeItem("falcon_real_peer_id");
     location.reload();
   }
 </script>
