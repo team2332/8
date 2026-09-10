@@ -304,8 +304,8 @@
       flex-direction: column; justify-content: center; align-items: center; padding: 20px;
     }
     .call-overlay.active { display: flex; }
-    .video-container { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; max-width: 500px; }
-    video { width: 50%; height: 180px; background: #000; border-radius: 12px; border: 2px solid var(--border-color); object-fit: cover; }
+    .video-container { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; max-width: 600px; justify-content: center; }
+    video { width: 48%; height: 200px; background: #000; border-radius: 12px; border: 2px solid var(--border-color); object-fit: cover; }
 
     .edit-profile-modal {
       position: absolute; top: 0; left: 0; right: 0; bottom: 0;
@@ -782,12 +782,12 @@
     function hideAlert() { document.getElementById("alertBox").style.display = "none"; }
 
     /* =========================================================
-       🛠️ المحرك المعدل: ربط تلقائي وإرسال ذكي عبر DataChannel
+       🛠️ المحرك المعدل بالكامل: إصلاح الكاميرات والرسائل الفورية
        ========================================================= */
 
     let myPeer = null;
     let connections = {};
-    let pendingMessages = {}; // قائمة انتظار للرسائل المعلقة
+    let pendingMessages = {};
     let activeCall = null;
     let localStream = null;
     let activePeerId = null;
@@ -817,12 +817,17 @@
         try { myPeer.destroy(); } catch(e){}
       }
 
+      // إضافة سيرفرات STUN متعددة لضمان فتح الكاميرات والرسائل عبر مختلف شبكات الإنترنت
       myPeer = new Peer(peerId, {
         config: {
           iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
             { urls: 'stun:stun1.l.google.com:19302' },
-            { urls: 'stun:stun2.l.google.com:19302' }
+            { urls: 'stun:stun2.l.google.com:19302' },
+            { urls: 'stun:stun3.l.google.com:19302' },
+            { urls: 'stun:stun4.l.google.com:19302' },
+            { urls: 'stun:stun.services.mozilla.com' },
+            { urls: 'stun:global.stun.twilio.com:3478' }
           ]
         }
       });
@@ -845,16 +850,22 @@
         }
       });
 
+      // استقبال اتصال الشات النصي
       myPeer.on('connection', (conn) => {
         setupConnection(conn);
       });
 
+      // استقبال المكالمات المرئية والصوتية
       myPeer.on('call', async (call) => {
         const callerName = contacts[call.peer]?.name || call.peer;
         if (confirm(`📞 مكالمة واردة من (${callerName})! هل تريد الرد؟`)) {
           try {
             localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            document.getElementById("localVideo").srcObject = localStream;
+            
+            const localVid = document.getElementById("localVideo");
+            localVid.srcObject = localStream;
+            localVid.play().catch(e => console.log(e));
+
             document.getElementById("callOverlay").classList.add("active");
             document.getElementById("callStatusText").textContent = `متصل بمكالمة مع ${callerName} 🟢`;
 
@@ -862,10 +873,12 @@
             activeCall = call;
 
             call.on('stream', (remoteStream) => {
-              document.getElementById("remoteVideo").srcObject = remoteStream;
+              const remoteVid = document.getElementById("remoteVideo");
+              remoteVid.srcObject = remoteStream;
+              remoteVid.play().catch(e => console.log("خطأ تشغيل فيديو الصديق:", e));
             });
           } catch (err) {
-            alert("تعذر الوصول للكاميرا والميكروفون!");
+            alert("تأكد من السماح بإذن الكاميرا والميكروفون من المتصفح!");
           }
         }
       });
@@ -877,14 +890,10 @@
       conn.on('open', () => {
         connections[conn.peer] = conn;
 
-        // إرسال الرسائل المعلقة تلقائياً فور جاهزية القناة
+        // إرسال الرسائل المعلقة
         if (pendingMessages[conn.peer] && pendingMessages[conn.peer].length > 0) {
           pendingMessages[conn.peer].forEach(msgText => {
             conn.send({ type: 'msg', text: msgText, senderName: myProfile.name });
-            saveMessage(conn.peer, msgText, 'outgoing', 'أنت');
-            if (activePeerId === conn.peer) {
-              appendMessageUI(msgText, 'outgoing', 'أنت');
-            }
           });
           pendingMessages[conn.peer] = [];
         }
@@ -894,7 +903,7 @@
             id: conn.peer,
             name: "لاعب " + conn.peer,
             avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=" + conn.peer,
-            lastMsg: "تم الربط بنجاح"
+            lastMsg: "متصل الآن 🟢"
           };
           saveContacts();
         }
@@ -944,7 +953,7 @@
       }
 
       if (!connections[peerId] || !connections[peerId].open) {
-        const conn = myPeer.connect(peerId);
+        const conn = myPeer.connect(peerId, { reliable: true });
         setupConnection(conn);
       }
 
@@ -965,7 +974,7 @@
       avatarImg.style.display = "block";
 
       if (!connections[peerId] || !connections[peerId].open) {
-        const conn = myPeer.connect(peerId);
+        const conn = myPeer.connect(peerId, { reliable: true });
         setupConnection(conn);
       }
 
@@ -1024,27 +1033,29 @@
       });
     }
 
+    // إرسال الرسالة فوراً في الشاشة وإرسالها برمجياً
     function sendRealMessage() {
       const input = document.getElementById("chatInput");
       const text = input.value.trim();
       if (!text) return;
       if (!activePeerId) return alert("اختر جهة اتصال من القائمة أولاً!");
 
+      // 1. عرض الرسالة فوراً في الشاشة وحفظها
+      saveMessage(activePeerId, text, 'outgoing', 'أنت');
+      appendMessageUI(text, 'outgoing', 'أنت');
+      input.value = "";
+
+      // 2. إرسال عبر الشبكة
       let conn = connections[activePeerId];
 
       if (conn && conn.open) {
         conn.send({ type: 'msg', text: text, senderName: myProfile.name });
-        saveMessage(activePeerId, text, 'outgoing', 'أنت');
-        appendMessageUI(text, 'outgoing', 'أنت');
-        input.value = "";
       } else {
-        // إذا لم يكتمل الاتصال بعد، نضع الرسالة في الانتظار ويتم إرسالها فور اكتمال الربط
         if (!pendingMessages[activePeerId]) pendingMessages[activePeerId] = [];
         pendingMessages[activePeerId].push(text);
-        input.value = "";
 
-        if (!conn) {
-          conn = myPeer.connect(activePeerId);
+        if (!conn || !conn.open) {
+          conn = myPeer.connect(activePeerId, { reliable: true });
           setupConnection(conn);
         }
       }
@@ -1064,12 +1075,17 @@
       container.scrollTop = container.scrollHeight;
     }
 
+    // بدء المكالمة وإظهار الكاميرا فوراً للطرفين
     async function startRealCall(hasVideo) {
       if (!activePeerId) return alert("اختر شخصاً من المحادثات أولاً للاتصال به!");
 
       try {
         localStream = await navigator.mediaDevices.getUserMedia({ video: hasVideo, audio: true });
-        document.getElementById("localVideo").srcObject = localStream;
+        
+        const localVid = document.getElementById("localVideo");
+        localVid.srcObject = localStream;
+        localVid.play().catch(e => console.log(e));
+
         document.getElementById("callOverlay").classList.add("active");
         
         const contactName = contacts[activePeerId]?.name || activePeerId;
@@ -1080,10 +1096,12 @@
 
         call.on('stream', (remoteStream) => {
           document.getElementById("callStatusText").textContent = `تم الرد - مكالمة متصلة 🟢`;
-          document.getElementById("remoteVideo").srcObject = remoteStream;
+          const remoteVid = document.getElementById("remoteVideo");
+          remoteVid.srcObject = remoteStream;
+          remoteVid.play().catch(e => console.log("خطأ تشغيل فيديو الطرف الآخر:", e));
         });
       } catch (e) {
-        alert("تأكد من السماح بإذن الكاميرا والميكروفون في متصفحك!");
+        alert("يرجى التأكد من إعطاء إذن الكاميرا والميكروفون في المتصفح وتجربة فتح الموقع برابط آمن (HTTPS أو localhost).");
       }
     }
 
