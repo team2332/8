@@ -782,11 +782,12 @@
     function hideAlert() { document.getElementById("alertBox").style.display = "none"; }
 
     /* =========================================================
-       🛠️ إصلاح محرك PeerJS مع حل معالجة الأخطاء والتوليد التلقائي
+       🛠️ المحرك المعدل: ربط تلقائي وإرسال ذكي عبر DataChannel
        ========================================================= */
 
     let myPeer = null;
     let connections = {};
+    let pendingMessages = {}; // قائمة انتظار للرسائل المعلقة
     let activeCall = null;
     let localStream = null;
     let activePeerId = null;
@@ -802,13 +803,10 @@
 
     function initRealPeer() {
       let savedPeerId = localStorage.getItem("falcon_real_peer_id");
-      
-      // إنتاج كود عشوائي فريد ومؤمن برقم عشوائي طويل لتفادي التعارض
       if (!savedPeerId) {
         savedPeerId = "fl-" + Math.floor(100000 + Math.random() * 900000);
         localStorage.setItem("falcon_real_peer_id", savedPeerId);
       }
-      
       connectToPeerServer(savedPeerId);
     }
 
@@ -819,7 +817,6 @@
         try { myPeer.destroy(); } catch(e){}
       }
 
-      // إضافة سيرفرات STUN من Google لضمان سرعة الربط وعدم التعليق
       myPeer = new Peer(peerId, {
         config: {
           iceServers: [
@@ -838,12 +835,8 @@
         renderContactsList();
       });
 
-      // 🛡️ حل التعليق: معالج الأخطاء في حالة التعارض أو انقطاع السيرفر
       myPeer.on('error', (err) => {
-        console.warn("PeerJS Event Error:", err.type, err);
-
         if (err.type === 'unavailable-id') {
-          // الرقم مستخدم بالفعل، يتم إعطاء كود جديد تلقائياً فوراً
           const newId = "fl-" + Math.floor(100000 + Math.random() * 900000);
           localStorage.setItem("falcon_real_peer_id", newId);
           connectToPeerServer(newId);
@@ -882,6 +875,20 @@
       connections[conn.peer] = conn;
 
       conn.on('open', () => {
+        connections[conn.peer] = conn;
+
+        // إرسال الرسائل المعلقة تلقائياً فور جاهزية القناة
+        if (pendingMessages[conn.peer] && pendingMessages[conn.peer].length > 0) {
+          pendingMessages[conn.peer].forEach(msgText => {
+            conn.send({ type: 'msg', text: msgText, senderName: myProfile.name });
+            saveMessage(conn.peer, msgText, 'outgoing', 'أنت');
+            if (activePeerId === conn.peer) {
+              appendMessageUI(msgText, 'outgoing', 'أنت');
+            }
+          });
+          pendingMessages[conn.peer] = [];
+        }
+
         if (!contacts[conn.peer]) {
           contacts[conn.peer] = {
             id: conn.peer,
@@ -1023,18 +1030,24 @@
       if (!text) return;
       if (!activePeerId) return alert("اختر جهة اتصال من القائمة أولاً!");
 
-      const conn = connections[activePeerId];
-      if (!conn || !conn.open) {
-        alert("جاري إعادة الربط بالصديق... تأكد من أنه متصل بالإنترنت وفاتح للشات!");
-        const newConn = myPeer.connect(activePeerId);
-        setupConnection(newConn);
-        return;
-      }
+      let conn = connections[activePeerId];
 
-      conn.send({ type: 'msg', text: text, senderName: myProfile.name });
-      saveMessage(activePeerId, text, 'outgoing', 'أنت');
-      appendMessageUI(text, 'outgoing', 'أنت');
-      input.value = "";
+      if (conn && conn.open) {
+        conn.send({ type: 'msg', text: text, senderName: myProfile.name });
+        saveMessage(activePeerId, text, 'outgoing', 'أنت');
+        appendMessageUI(text, 'outgoing', 'أنت');
+        input.value = "";
+      } else {
+        // إذا لم يكتمل الاتصال بعد، نضع الرسالة في الانتظار ويتم إرسالها فور اكتمال الربط
+        if (!pendingMessages[activePeerId]) pendingMessages[activePeerId] = [];
+        pendingMessages[activePeerId].push(text);
+        input.value = "";
+
+        if (!conn) {
+          conn = myPeer.connect(activePeerId);
+          setupConnection(conn);
+        }
+      }
     }
 
     function appendMessageUI(text, type, sender) {
