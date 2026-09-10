@@ -3,1198 +3,357 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Falcons MC - بوابة اللاعبين والشات</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-  <!-- مكتبة PeerJS -->
-  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-
+  <title>Falcon MC - لوحة اللاعبين</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-color: #0b0f19;
-      --card-bg: #151c2c;
+      --bg-main: #0b0f19;
+      --bg-card: #151c2c;
       --accent: #10b981;
       --accent-hover: #059669;
-      --discord-color: #5865F2;
-      --discord-hover: #4752C4;
-      --text-main: #f3f4f6;
-      --text-sub: #9ca3af;
-      --input-bg: #1e293b;
-      --border-color: #334155;
+      --primary: #3b82f6;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border: #334155;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0; padding: 0;
-      font-family: 'Cairo', sans-serif;
-      user-select: none;
-    }
-
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      background-image: 
-        radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(88, 101, 242, 0.1) 0%, transparent 40%);
-    }
-
-    .container {
-      width: 100%;
-      max-width: 480px;
-      background: var(--card-bg);
-      padding: 35px 30px;
-      border-radius: 16px;
-      border: 1px solid var(--border-color);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .container::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #10b981, #5865F2);
-    }
-
-    .header { text-align: center; margin-bottom: 20px; }
-    .header h1 { font-size: 26px; font-weight: 900; color: #fff; margin-bottom: 5px; }
-    .header p { color: var(--text-sub); font-size: 13px; }
-
-    .tab-container {
-      display: flex;
-      background: var(--input-bg);
-      padding: 4px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      border: 1px solid var(--border-color);
-    }
-
-    .tab-btn {
-      flex: 1; padding: 10px;
-      background: transparent; border: none;
-      color: var(--text-sub); font-weight: 700; font-size: 14px;
-      border-radius: 8px; cursor: pointer; transition: all 0.2s;
-    }
-
-    .tab-btn.active { background: var(--accent); color: #fff; }
-
-    .form-step { display: none; }
-    .form-step.active { display: block; }
-
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #e2e8f0; }
-    .form-group input {
-      width: 100%; padding: 12px 14px;
-      background-color: var(--input-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px; color: #fff; font-size: 14px; outline: none;
-    }
-    .form-group input:focus { border-color: var(--accent); }
-
-    .otp-input {
-      text-align: center; letter-spacing: 8px;
-      font-size: 22px !important; font-weight: bold; color: var(--accent) !important;
-    }
-
-    .btn-submit {
-      width: 100%; padding: 13px;
-      background-color: var(--accent); color: #fff;
-      border: none; border-radius: 8px;
-      font-size: 15px; font-weight: 700; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      gap: 10px; margin-top: 10px;
-    }
-    .btn-submit:hover { background-color: var(--accent-hover); }
-
-    .btn-discord { background-color: var(--discord-color); color: #fff; }
-    .btn-discord:hover { background-color: var(--discord-hover); }
-
-    .btn-danger { background-color: #ef4444; margin-top: 10px; }
-    .btn-danger:hover { background-color: #dc2626; }
-
-    .btn-secondary {
-      background: transparent; border: 1px solid var(--border-color);
-      color: var(--text-sub); padding: 10px; width: 100%;
-      border-radius: 8px; font-size: 13px; margin-top: 10px; cursor: pointer;
-    }
-
-    .dashboard-card {
-      background-color: var(--input-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 12px; padding: 20px;
-      margin-bottom: 15px; text-align: center;
-    }
-
-    .player-code-box {
-      background: rgba(59, 130, 246, 0.15);
-      border: 1px dashed #3b82f6;
-      color: #60a5fa;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: bold;
-      display: inline-block;
-      margin: 10px 0;
-    }
-
-    .status-badge {
-      display: inline-block;
-      background-color: rgba(16, 185, 129, 0.2);
-      color: var(--accent); border: 1px solid var(--accent);
-      padding: 4px 14px; border-radius: 20px;
-      font-size: 13px; font-weight: bold; margin-bottom: 12px;
-    }
-
-    .server-info {
-      display: flex; flex-direction: column; gap: 10px;
-      margin-top: 15px; text-align: right;
-    }
-
-    .info-item {
-      display: flex; justify-content: space-between; align-items: center;
-      background: #0f172a; padding: 10px 12px; border-radius: 8px; font-size: 13px;
-    }
-
-    .copy-btn {
-      background-color: #3b82f6; color: #fff; border: none;
-      padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: bold;
-    }
-
-    .spinner {
-      width: 18px; height: 18px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-top-color: #fff; border-radius: 50%;
-      animation: spin 0.8s linear infinite; display: none;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .alert {
-      padding: 12px; border-radius: 8px; font-size: 13px;
-      margin-top: 15px; display: none; text-align: center; font-weight: 600;
-    }
-    .alert-success { background: rgba(16, 185, 129, 0.15); border: 1px solid var(--accent); color: #34d399; }
-    .alert-error { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #f87171; }
-
-    .footer { margin-top: 20px; text-align: center; font-size: 12px; color: var(--text-sub); }
-
-    .top-menu-btn {
-      position: fixed; top: 20px; right: 20px; z-index: 1000;
-      background: var(--card-bg); border: 1px solid var(--border-color);
-      width: 45px; height: 45px; border-radius: 12px;
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      gap: 5px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    }
-    .top-menu-btn span { width: 22px; height: 3px; background-color: var(--accent); border-radius: 2px; }
-
-    .sidebar-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px);
-      z-index: 1001; opacity: 0; pointer-events: none; transition: opacity 0.3s;
-    }
-    .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
-
-    .sidebar {
-      position: fixed; top: 0; right: -320px; width: 300px; height: 100%;
-      background: var(--card-bg); border-left: 1px solid var(--border-color);
-      z-index: 1002; transition: right 0.3s ease;
-      display: flex; flex-direction: column; padding: 25px 20px;
-    }
-    .sidebar.active { right: 0; }
-
-    .sidebar-header {
-      display: flex; justify-content: space-between; align-items: center;
-      padding-bottom: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px;
-    }
-    .sidebar-item {
-      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-      background: var(--input-bg); border-radius: 10px; color: #fff;
-      font-weight: 700; cursor: pointer; margin-bottom: 10px;
-    }
-    .sidebar-item:hover { color: var(--accent); }
-
-    .chat-modal-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(6px);
-      z-index: 1050; display: none; justify-content: center; align-items: center; padding: 15px;
-    }
-    .chat-modal-overlay.active { display: flex; }
-
-    .chat-container {
-      width: 100%; max-width: 950px; height: 85vh;
-      background: var(--card-bg); border: 1px solid var(--border-color);
-      border-radius: 16px; display: flex; overflow: hidden; position: relative;
-    }
-
-    .chat-sidebar {
-      width: 320px; background: var(--bg-color);
-      border-left: 1px solid var(--border-color); display: flex; flex-direction: column;
-    }
-
-    .chat-user-profile {
-      padding: 14px 16px; background: var(--input-bg);
-      border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px;
-      position: relative;
-    }
-    .chat-avatar {
-      width: 44px; height: 44px; border-radius: 50%;
-      object-fit: cover; border: 2px solid var(--accent); background: #334155;
-    }
-
-    .edit-profile-btn {
-      position: absolute; left: 12px; top: 16px;
-      background: transparent; border: none; color: var(--text-sub); cursor: pointer; font-size: 18px;
-    }
-
-    .add-contact-box { padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; gap: 8px; }
-    .add-contact-box input {
-      flex: 1; padding: 8px 12px; background: var(--input-bg);
-      border: 1px solid var(--border-color); border-radius: 8px; color: #fff; font-size: 12px; outline: none;
-    }
-    .add-contact-box button {
-      background: var(--accent); border: none; color: #fff; padding: 0 12px; border-radius: 8px; font-weight: bold; cursor: pointer;
-    }
-
-    .contacts-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
+    body { background-color: var(--bg-main); color: var(--text); padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
     
-    .contact-item {
-      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-      border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.2s;
-    }
-    .contact-item:hover { background: rgba(255,255,255,0.03); }
-    .contact-item.active { background: var(--input-bg); border-right: 4px solid var(--accent); }
-
-    .contact-item img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #334155; }
-    .contact-info { flex: 1; overflow: hidden; }
-    .contact-info h5 { color: #fff; font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .contact-info p { color: var(--text-sub); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-
-    .chat-main { flex: 1; display: flex; flex-direction: column; background: var(--card-bg); position: relative; }
+    .container { width: 100%; max-width: 900px; }
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 20px; }
     
-    .chat-header {
-      padding: 12px 20px; background: var(--input-bg);
-      border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;
-    }
-
-    .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+    h1, h2, h3 { color: #fff; margin-bottom: 15px; }
+    .brand-title { color: var(--accent); text-align: center; font-size: 2rem; margin-bottom: 20px; }
     
-    .msg-bubble {
-      max-width: 70%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5; word-break: break-word;
-    }
-    .msg-incoming { align-self: flex-start; background: var(--input-bg); color: #fff; border-bottom-right-radius: 2px; }
-    .msg-outgoing { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-left-radius: 2px; }
-
-    .chat-input-area {
-      padding: 14px 20px; background: var(--input-bg);
-      border-top: 1px solid var(--border-color); display: flex; gap: 10px;
-    }
-    .chat-input-area input {
-      flex: 1; padding: 12px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; color: #fff; outline: none;
-    }
-
-    .call-overlay {
-      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(11, 15, 25, 0.95); z-index: 1100; display: none;
-      flex-direction: column; justify-content: center; align-items: center; padding: 20px;
-    }
-    .call-overlay.active { display: flex; }
-    .video-container { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; max-width: 600px; justify-content: center; }
-    video { width: 48%; height: 200px; background: #000; border-radius: 12px; border: 2px solid var(--border-color); object-fit: cover; }
-
-    .edit-profile-modal {
-      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.98); z-index: 1080; display: none;
-      flex-direction: column; padding: 25px; justify-content: center;
-    }
-    .edit-profile-modal.active { display: flex; }
-    .avatar-preview { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--accent); margin: 0 auto 15px auto; display: block; object-fit: cover; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 0.9rem; }
+    input { width: 100%; padding: 12px; background: #1e293b; border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 1rem; outline: none; transition: 0.3s; }
+    input:focus { border-color: var(--accent); }
+    
+    .btn { width: 100%; padding: 12px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+    .btn:hover { background: var(--accent-hover); }
+    .btn-secondary { background: #475569; }
+    .btn-secondary:hover { background: #334155; }
+    
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+    .tab-btn { flex: 1; padding: 10px; background: #1e293b; color: var(--text-muted); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: bold; }
+    .tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    
+    .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .info-box { background: #1e293b; border: 1px solid var(--border); padding: 15px; border-radius: 10px; text-align: center; }
+    .info-box span { display: block; font-size: 0.85rem; color: var(--text-muted); }
+    .info-box strong { font-size: 1.2rem; color: var(--accent); word-break: break-all; }
+    
+    .section-box { background: #111827; border: 1px solid var(--border); padding: 15px; border-radius: 10px; margin-top: 15px; }
+    .list-item { background: #1e293b; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-right: 4px solid var(--accent); }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; background: var(--primary); color: #fff; margin-bottom: 5px; }
+    
+    .hidden { display: none !important; }
+    .alert { padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; text-align: center; }
+    .alert-error { background: #7f1d1d; color: #fca5a5; }
+    .alert-success { background: #064e3b; color: #6ee7b7; }
   </style>
 </head>
 <body>
 
-  <button class="top-menu-btn" onclick="toggleSidebar()">
-    <span></span><span></span><span></span>
-  </button>
-
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-  <div class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <h2>🦅 Falcons MC</h2>
-      <button style="background:none; border:none; color:#fff; font-size:20px; cursor:pointer;" onclick="closeSidebar()">✕</button>
-    </div>
-    <div class="sidebar-item" onclick="closeSidebar()">🏠 الصفحة الرئيسية</div>
-    <div class="sidebar-item" onclick="openChatModal(); closeSidebar();">💬 شات Falcons الحقيقي</div>
-    <div class="sidebar-item" onclick="copyIp(); closeSidebar();">🎮 نسخ IP السيرفر</div>
-    <div class="sidebar-item" onclick="window.open('https://discord.gg/K2D3Ydy9b', '_blank'); closeSidebar();">🌐 سيرفر الديسكورد</div>
-  </div>
-
-  <div class="chat-modal-overlay" id="chatModalOverlay">
-    <div class="chat-container">
-
-      <div class="chat-sidebar">
-        <div class="chat-user-profile">
-          <img id="myChatAvatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=SOKAR" class="chat-avatar">
-          <div>
-            <h4 id="myChatName" style="color: #fff; font-size: 14px;">لاعب Falcon</h4>
-            <p style="font-size: 10px; color: var(--accent);">رقمك: <strong id="myChatCode">جاري التجهيز...</strong> <button class="copy-btn" style="padding: 1px 5px; font-size: 9px;" onclick="copyMyCode()">نسخ</button></p>
-          </div>
-          <button class="edit-profile-btn" onclick="toggleEditProfile(true)" title="تعديل البروفايل">⚙️</button>
-        </div>
-
-        <div class="add-contact-box">
-          <input type="text" id="peerIdInput" placeholder="أدخل رقم Peer للصديق...">
-          <button onclick="addNewContact()">إضافة ➕</button>
-        </div>
-
-        <div class="contacts-list" id="contactsListContainer"></div>
-      </div>
-
-      <div class="chat-main">
-        <div class="chat-header">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <img id="activeContactAvatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=default" style="width:36px; height:36px; border-radius:50%; display:none;">
-            <div>
-              <h4 id="activePeerName" style="color: #fff; font-size: 14px;">اختر محادثة للبدء</h4>
-              <p id="activePeerId" style="font-size: 10px; color: var(--text-sub);">الرقم الخاص: ---</p>
-            </div>
-          </div>
-          <div style="display: flex; gap: 8px;">
-            <button class="copy-btn" style="background:#10b981;" onclick="startRealCall(false)">📞 اتصال صوتي</button>
-            <button class="copy-btn" style="background:#3b82f6;" onclick="startRealCall(true)">📹 فيديو</button>
-            <button class="copy-btn" style="background:#ef4444;" onclick="closeChatModal()">إغلاق ✕</button>
-          </div>
-        </div>
-
-        <div class="chat-messages" id="chatMessages">
-          <div style="text-align: center; color: var(--text-sub); margin-top: 50px; font-size: 13px;">
-            اختر جهة اتصال من القائمة الجانبية أو أضف رقماً جديداً لتبدأ المحادثة والمكالمات! 🚀
-          </div>
-        </div>
-
-        <div class="chat-input-area">
-          <input type="text" id="chatInput" placeholder="اكتب رسالتك..." onkeydown="if(event.key==='Enter') sendRealMessage()">
-          <button class="copy-btn" style="padding: 0 20px;" onclick="sendRealMessage()">إرسال 🚀</button>
-        </div>
-
-        <div class="call-overlay" id="callOverlay">
-          <h3 style="color:#fff; margin-bottom: 10px;" id="callStatusText">جاري الاتصال... 📲</h3>
-          <div class="video-container">
-            <video id="localVideo" autoplay playsinline muted title="كاميرتك"></video>
-            <video id="remoteVideo" autoplay playsinline title="كاميرا الصديق"></video>
-          </div>
-          <button class="btn-submit btn-danger" style="width: auto; padding: 10px 30px;" onclick="endCall()">إنهاء المكالمة ❌</button>
-        </div>
-
-        <div class="edit-profile-modal" id="editProfileModal">
-          <h3 style="color: #fff; margin-bottom: 15px; text-align: center;">⚙️ تعديل اسمك وصورتك الشخصية</h3>
-          
-          <img id="avatarPreview" src="https://api.dicebear.com/7.x/bottts/svg?seed=SOKAR" class="avatar-preview">
-
-          <div class="form-group">
-            <label>اختر صورة من جهازك:</label>
-            <input type="file" id="avatarFileInput" accept="image/*" onchange="handleFileSelect(event)" style="padding: 6px;">
-          </div>
-
-          <div class="form-group">
-            <label>أو ضع رابط صورة مباشر:</label>
-            <input type="text" id="editAvatarUrl" placeholder="https://..." oninput="document.getElementById('avatarPreview').src = this.value">
-          </div>
-
-          <div class="form-group">
-            <label>الاسم الظاهر:</label>
-            <input type="text" id="editNameInput" placeholder="اسمك">
-          </div>
-
-          <button class="btn-submit" onclick="saveProfileChanges()">حفظ التعديلات ✅</button>
-          <button class="btn-secondary" onclick="toggleEditProfile(false)">إلغاء</button>
-        </div>
-
-      </div>
-
-    </div>
-  </div>
-
-  <div class="container">
-    <div class="header">
-      <h1>🎮 Falcons MC</h1>
-      <p id="subHeader">بوابة دخول الأعضاء والـ Whitelist</p>
+<div class="container">
+  
+  <!-- نموذج تسجيل الدخول وإنشاء الحساب -->
+  <div id="authContainer" class="card">
+    <h1 class="brand-title">🎮 Falcon MC</h1>
+    
+    <div class="tabs">
+      <button class="tab-btn active" id="tabSignupBtn" onclick="switchAuthMode('signup')">حساب جديد</button>
+      <button class="tab-btn" id="tabLoginBtn" onclick="switchAuthMode('login')">تسجيل دخول</button>
     </div>
 
-    <div id="step1" class="form-step active">
-      <div class="tab-container">
-        <button type="button" class="tab-btn active" id="tabSignupBtn" onclick="switchTab('signup')">إنشاء حساب</button>
-        <button type="button" class="tab-btn" id="tabLoginBtn" onclick="switchTab('login')">تسجيل الدخول</button>
-      </div>
+    <div id="alertMsg" class="alert hidden"></div>
 
-      <form id="signupForm">
+    <!-- 1. نموذج إرسال الـ OTP -->
+    <form id="otpReqForm" onsubmit="handleSendOtp(event)">
+      <div id="signupFields">
         <div class="form-group">
-          <label for="ign">اسم اللاعب في اللعبة (IGN)</label>
-          <input type="text" id="ign" placeholder="مثال: SOKAR">
+          <label for="ign">اسمك في اللعبة (IGN)</label>
+          <input type="text" id="ign" placeholder="مثال: Steve_99">
         </div>
         <div class="form-group">
-          <label for="fullName">الاسم الحقيقي الثنائي</label>
-          <input type="text" id="fullName" placeholder="مثال: أحمد محمد">
+          <label for="fullName">الاسم الكامل</label>
+          <input type="text" id="fullName" placeholder="الاسم الثلاثي">
         </div>
         <div class="form-group">
           <label for="age">السن</label>
-          <input type="number" id="age" min="8" max="99" placeholder="مثال: 18">
-        </div>
-        <div class="form-group">
-          <label for="email">البريد الإلكتروني (Gmail)</label>
-          <input type="email" id="email" placeholder="example@gmail.com">
-        </div>
-        <button type="submit" id="sendOtpBtn1" class="btn-submit">
-          <span id="btnText1">إرسال رمز التحقق (OTP)</span>
-          <div id="btnSpinner1" class="spinner"></div>
-        </button>
-      </form>
-
-      <form id="loginForm" style="display: none;">
-        <div class="form-group">
-          <label for="loginEmail">البريد الإلكتروني المسجل (Gmail)</label>
-          <input type="email" id="loginEmail" placeholder="example@gmail.com">
-        </div>
-        <button type="submit" id="sendOtpBtn2" class="btn-submit">
-          <span id="btnText2">إرسال رمز الدخول (OTP)</span>
-          <div id="btnSpinner2" class="spinner"></div>
-        </button>
-      </form>
-    </div>
-
-    <div id="step2" class="form-step">
-      <form id="otpForm">
-        <p style="text-align: center; color: #9ca3af; font-size: 13px; margin-bottom: 15px;">
-          تم إرسال الرمز إلى البريد:<br><strong id="userEmailDisplay" style="color: #10b981;"></strong>
-        </p>
-        <div class="form-group">
-          <label for="otpCode" style="text-align: center;">رمز التحقق (OTP)</label>
-          <input type="text" id="otpCode" class="otp-input" maxlength="6" placeholder="000000" autocomplete="off">
-        </div>
-        <button type="submit" id="verifyBtn" class="btn-submit">
-          <span id="btnText3">تأكيد الرمز والتأهيل</span>
-          <div id="btnSpinner3" class="spinner"></div>
-        </button>
-        <button type="button" class="btn-secondary" onclick="resetToStep1()">العودة للخلف</button>
-      </form>
-    </div>
-
-    <div id="step3" class="form-step">
-      <div class="dashboard-card">
-        <div class="status-badge">مفعل رسمياً في الـ Whitelist ✅</div>
-        <h2 style="color: #fff; font-size: 18px;">أهلاً بك يا <span id="playerIgnDisplay" style="color: var(--accent);"></span> 🚀</h2>
-        
-        <div class="player-code-box">
-          كود اللاعب الخاص بك: <span id="playerCodeDisplay">---</span>
-        </div>
-
-        <div class="server-info">
-          <div class="info-item">
-            <span>عنوان السيرفر (IP):</span>
-            <div>
-              <strong id="serverIpText" style="color: #10b981; margin-left: 6px;">sqrmc.aternos.me:19423</strong>
-              <button class="copy-btn" onclick="copyIp()">نسخ</button>
-            </div>
-          </div>
-          <div class="info-item">
-            <span>الإصدار:</span>
-            <strong style="color: #fff;">زي ما انت عايز</strong>
-          </div>
+          <input type="number" id="age" placeholder="18">
         </div>
       </div>
-
-      <div style="margin-top: 15px; text-align: right;">
-        <h3 style="color: #fff; font-size: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
-          <span>📢</span> أخبار وتحديثات السيرفر
-        </h3>
-        <div id="newsContainer" style="display: flex; flex-direction: column; gap: 10px;"></div>
+      
+      <div class="form-group">
+        <label for="email">البريد الإلكتروني</label>
+        <input type="email" id="email" placeholder="name@example.com" required>
       </div>
 
-      <div style="margin-top: 20px; text-align: right;">
-        <h3 style="color: #fff; font-size: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
-          <span>⚖️</span> السجل الجنائي والقضايا
-        </h3>
-        <div id="casesContainer" style="display: flex; flex-direction: column; gap: 10px;"></div>
+      <button type="submit" id="sendOtpBtn" class="btn">إرسال رمز التحقق (OTP)</button>
+    </form>
+
+    <!-- 2. نموذج تأكيد الـ OTP -->
+    <form id="otpVerifyForm" class="hidden" onsubmit="handleVerifyOtp(event)">
+      <p style="text-align: center; margin-bottom: 15px; color: var(--text-muted);">
+        تم إرسال رمز التحقق إلى بريدك الإلكتروني.
+      </p>
+      <div class="form-group">
+        <label for="otpCode">رمز التحقق (OTP)</label>
+        <input type="text" id="otpCode" placeholder="أدخل الـ 6 أرقام" required maxlength="6">
       </div>
-
-      <div class="dashboard-card" style="border-color: rgba(88, 101, 242, 0.4); margin-top: 20px;">
-        <h3 style="color: #fff; font-size: 15px; margin-bottom: 5px;">مجتمع الديسكورد الرسمى 💬</h3>
-        <p style="color: var(--text-sub); font-size: 12px; margin-bottom: 12px;">انضم للديسكورد لمتابعة التحديثات والفعاليات والتواصل مع اللاعبين.</p>
-        <button type="button" class="btn-submit btn-discord" onclick="window.open('https://discord.gg/K2D3Ydy9b', '_blank')">
-          الانضمام لسيرفر Discord 🚀
-        </button>
-      </div>
-
-      <button type="button" class="btn-submit btn-danger" onclick="logout()">
-        تسجيل الخروج 🚪
-      </button>
-    </div>
-
-    <div id="alertBox" class="alert"></div>
-    <div class="footer">جميع الحقوق محفوظة &copy; Falcons MC , SOKAR DEV 2026</div>
+      <button type="submit" id="verifyOtpBtn" class="btn">تأكيد والدخول</button>
+      <button type="button" class="btn btn-secondary" onclick="resetAuthForm()">تغيير البريد</button>
+    </form>
   </div>
 
-  <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwWEhMPCOtmYF1lpg2LuqOgZcgdaLra5AAVvC1UcJQCptdLT3cqvzPVagFn5wq9WxYgOw/exec";
+  <!-- لوحة التحكم (Dashboard) -->
+  <div id="dashboardContainer" class="card hidden">
+    <h2 style="display: flex; justify-content: space-between; align-items: center;">
+      <span>أهلاً بك، <span id="dashIgn" style="color: var(--accent);"></span></span>
+      <button class="btn btn-secondary" style="width: auto; padding: 5px 15px; font-size: 0.85rem;" onclick="logout()">خروج</button>
+    </h2>
 
-    let currentEmail = "";
-    let currentIgn = "";
-    let currentCode = "";
+    <!-- بيانات الحساب المربوطة -->
+    <div class="profile-grid">
+      <div class="info-box">
+        <span>كود اللاعب</span>
+        <strong id="dashPlayerCode">---</strong>
+      </div>
+      <div class="info-box">
+        <span>الرقم الوهمي المربوط</span>
+        <strong id="dashVirtualPhone" style="color: var(--primary);">---</strong>
+      </div>
+      <div class="info-box">
+        <span>البريد الإلكتروني</span>
+        <strong id="dashEmail" style="font-size: 0.9rem; color: #fff;">---</strong>
+      </div>
+    </div>
 
-    window.addEventListener("DOMContentLoaded", () => {
-      const savedSession = JSON.parse(localStorage.getItem("falcon_session"));
-      if (savedSession && savedSession.isLoggedIn) {
-        currentEmail = savedSession.email;
-        currentIgn = savedSession.ign;
-        currentCode = savedSession.playerCode;
-        showDashboard();
-      }
-      initRealPeer();
-    });
+    <!-- قسم الأخبار والإعلانات -->
+    <div class="section-box">
+      <h3>📢 آخر الأخبار والإعلانات</h3>
+      <div id="newsList">لا توجد أخبار حالياً.</div>
+    </div>
 
-    function switchTab(tab) {
-      hideAlert();
-      if (tab === 'signup') {
-        document.getElementById("tabSignupBtn").classList.add("active");
-        document.getElementById("tabLoginBtn").classList.remove("active");
-        document.getElementById("signupForm").style.display = "block";
-        document.getElementById("loginForm").style.display = "none";
+    <!-- قسم القضايا والسجلات -->
+    <div class="section-box">
+      <h3>⚖️ سجل القضايا الخاص بك</h3>
+      <div id="casesList">لا توجد قضايا مسجلة باسمك.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ضع رابط الـ Web App الخاص بك هنا من Google Apps Script
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec";
+
+  let isLoginMode = false;
+  let currentEmail = "";
+
+  window.onload = function() {
+    checkSavedSession();
+  };
+
+  function showAlert(msg, type = "error") {
+    const el = document.getElementById("alertMsg");
+    el.className = `alert alert-${type}`;
+    el.innerText = msg;
+    el.classList.remove("hidden");
+  }
+
+  function hideAlert() {
+    document.getElementById("alertMsg").classList.add("hidden");
+  }
+
+  function switchAuthMode(mode) {
+    hideAlert();
+    isLoginMode = (mode === 'login');
+    document.getElementById("tabSignupBtn").className = `tab-btn ${!isLoginMode ? 'active' : ''}`;
+    document.getElementById("tabLoginBtn").className = `tab-btn ${isLoginMode ? 'active' : ''}`;
+    
+    if (isLoginMode) {
+      document.getElementById("signupFields").classList.add("hidden");
+    } else {
+      document.getElementById("signupFields").classList.remove("hidden");
+    }
+  }
+
+  async function handleSendOtp(e) {
+    e.preventDefault();
+    hideAlert();
+    
+    currentEmail = document.getElementById("email").value.trim();
+    const ign = document.getElementById("ign").value.trim();
+    const fullName = document.getElementById("fullName").value.trim();
+    const age = document.getElementById("age").value.trim();
+
+    if (!isLoginMode && !ign) {
+      return showAlert("يرجى كتابة اسمك في اللعبة (IGN)");
+    }
+
+    const btn = document.getElementById("sendOtpBtn");
+    btn.disabled = true;
+    btn.innerText = "جاري الإرسال...";
+
+    try {
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "sendOtp",
+          email: currentEmail,
+          ign: ign,
+          fullName: fullName,
+          age: age,
+          isLogin: isLoginMode
+        })
+      });
+
+      const data = await res.json();
+      btn.disabled = false;
+      btn.innerText = "إرسال رمز التحقق (OTP)";
+
+      if (data.status === "success") {
+        document.getElementById("otpReqForm").classList.add("hidden");
+        document.getElementById("otpVerifyForm").classList.remove("hidden");
       } else {
-        document.getElementById("tabLoginBtn").classList.add("active");
-        document.getElementById("tabSignupBtn").classList.remove("active");
-        document.getElementById("loginForm").style.display = "block";
-        document.getElementById("signupForm").style.display = "none";
+        showAlert(data.message || "حدث خطأ أثناء الإرسال");
       }
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerText = "إرسال رمز التحقق (OTP)";
+      showAlert("فشل الاتصال بالسيرفر. تحقق من الرابط ورابط الانترنت.");
     }
+  }
 
-    document.getElementById("signupForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      currentEmail = document.getElementById("email").value.trim();
-      currentIgn = document.getElementById("ign").value.trim();
+  async function handleVerifyOtp(e) {
+    e.preventDefault();
+    hideAlert();
 
-      if (!currentIgn || !currentEmail) return showAlert("يرجى ملء جميع الحقول.", "error");
+    const otp = document.getElementById("otpCode").value.trim();
+    const btn = document.getElementById("verifyOtpBtn");
+    btn.disabled = true;
+    btn.innerText = "جاري التحقق...";
 
-      sendOtpRequest({
-        action: "sendOtp",
-        ign: currentIgn,
-        fullName: document.getElementById("fullName").value.trim(),
-        age: document.getElementById("age").value.trim(),
-        email: currentEmail
-      }, "sendOtpBtn1", "btnText1", "btnSpinner1");
-    });
+    try {
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "verifyOtp",
+          email: currentEmail,
+          otp: otp
+        })
+      });
 
-    document.getElementById("loginForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      currentEmail = document.getElementById("loginEmail").value.trim();
+      const data = await res.json();
+      btn.disabled = false;
+      btn.innerText = "تأكيد والدخول";
 
-      if (!currentEmail) return showAlert("يرجى إدخال البريد الإلكتروني.", "error");
+      if (data.status === "success") {
+        // حفظ بيانات الجلسة ورقم التليفون الوهمي في LocalStorage
+        localStorage.setItem("falcon_user", JSON.stringify({
+          email: currentEmail,
+          ign: data.ign,
+          playerCode: data.playerCode,
+          virtualPhone: data.virtualPhone
+        }));
 
-      sendOtpRequest({
-        action: "sendOtp",
-        email: currentEmail,
-        isLogin: true
-      }, "sendOtpBtn2", "btnText2", "btnSpinner2");
-    });
-
-    async function sendOtpRequest(payload, btnId, textId, spinnerId) {
-      hideAlert();
-      const btn = document.getElementById(btnId);
-      const btnText = document.getElementById(textId);
-      const spinner = document.getElementById(spinnerId);
-
-      setLoading(btn, btnText, spinner, true, "جاري الإرسال...");
-
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
-        });
-        const result = await response.json();
-
-        if (result.status === "success") {
-          document.getElementById("userEmailDisplay").textContent = currentEmail;
-          showStep("step2");
-          showAlert("تم إرسال رمز التحقق إلى بريدك! 📧", "success");
-        } else {
-          showAlert(result.message || "حدث خطأ.", "error");
-        }
-      } catch (err) {
-        showAlert("فشل في الاتصال بالسيرفر.", "error");
-      } finally {
-        setLoading(btn, btnText, spinner, false, "إرسال رمز التحقق (OTP)");
-      }
-    }
-
-    document.getElementById("otpForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      hideAlert();
-
-      const verifyBtn = document.getElementById("verifyBtn");
-      const btnText3 = document.getElementById("btnText3");
-      const btnSpinner3 = document.getElementById("btnSpinner3");
-      const otpCode = document.getElementById("otpCode").value.trim();
-
-      setLoading(verifyBtn, btnText3, btnSpinner3, true, "جاري التحقق...");
-
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ action: "verifyOtp", email: currentEmail, otp: otpCode })
-        });
-        const result = await response.json();
-
-        if (result.status === "success") {
-          currentIgn = result.ign || currentIgn;
-          currentCode = result.playerCode || "N/A";
-
-          localStorage.setItem("falcon_session", JSON.stringify({
-            isLoggedIn: true,
-            email: currentEmail,
-            ign: currentIgn,
-            playerCode: currentCode
-          }));
-
-          showDashboard(result.news, result.cases);
-          showAlert("تم تسجيل الدخول بنجاح! 🎉", "success");
-        } else {
-          showAlert(result.message || "الرمز غير صحيح.", "error");
-        }
-      } catch (err) {
-        showAlert("حدث خطأ أثناء التحقق.", "error");
-      } finally {
-        setLoading(verifyBtn, btnText3, btnSpinner3, false, "تأكيد الرمز والتأهيل");
-      }
-    });
-
-    function showDashboard(newsData, casesData) {
-      document.getElementById("playerIgnDisplay").textContent = currentIgn || "اللاعب";
-      document.getElementById("playerCodeDisplay").textContent = currentCode || "N/A";
-      showStep("step3");
-
-      if (newsData && casesData) {
-        renderNews(newsData);
-        renderCases(casesData);
+        loadDashboard(data);
       } else {
-        fetchDashboardData();
+        showAlert(data.message || "رمز التحقق غير صحيح");
       }
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerText = "تأكيد والدخول";
+      showAlert("حدث خطأ أثناء التحقق من الرمز.");
+    }
+  }
 
-      if (currentIgn) {
-        myProfile.name = currentIgn;
-        updateProfileUI();
-      }
+  function loadDashboard(data) {
+    document.getElementById("authContainer").classList.add("hidden");
+    document.getElementById("dashboardContainer").classList.remove("hidden");
+
+    document.getElementById("dashIgn").innerText = data.ign || "لاعب";
+    document.getElementById("dashPlayerCode").innerText = data.playerCode || "---";
+    document.getElementById("dashVirtualPhone").innerText = data.virtualPhone || "---";
+    document.getElementById("dashEmail").innerText = currentEmail;
+
+    // حفظ الرقم الوهمي للشات (مثل PeerJS)
+    if (data.virtualPhone) {
+      localStorage.setItem("falcon_real_peer_id", data.virtualPhone);
     }
 
-    async function fetchDashboardData() {
+    // عرض الأخبار
+    const newsBox = document.getElementById("newsList");
+    if (data.news && data.news.length > 0) {
+      newsBox.innerHTML = data.news.map(item => `
+        <div class="list-item">
+          <span class="badge">${item.badge}</span>
+          <strong style="display:block; margin: 2px 0;">${item.title}</strong>
+          <p style="font-size:0.9rem; color:var(--text-muted);">${item.content}</p>
+          <small style="color:#64748b; display:block; margin-top:5px;">${item.date}</small>
+        </div>
+      `).join("");
+    } else {
+      newsBox.innerHTML = "<p style='color:var(--text-muted);'>لا توجد أخبار جديدة.</p>";
+    }
+
+    // عرض القضايا
+    const casesBox = document.getElementById("casesList");
+    if (data.cases && data.cases.length > 0) {
+      casesBox.innerHTML = data.cases.map(c => `
+        <div class="list-item" style="border-right-color: #ef4444;">
+          <strong>رقم القضية: ${c.caseNum} - ${c.title}</strong>
+          <p style="font-size:0.9rem; margin-top:4px;">${c.details}</p>
+          <div style="font-size:0.85rem; margin-top:6px; color:var(--text-muted);">
+            <span>الحالة: <b style="color:#f59e0b;">${c.status}</b></span> | 
+            <span>العقوبة: <b>${c.penalty}</b></span>
+          </div>
+        </div>
+      `).join("");
+    } else {
+      casesBox.innerHTML = "<p style='color:var(--text-muted);'>حسابك نظيف، لا توجد قضايا مسجلة.</p>";
+    }
+  }
+
+  async function checkSavedSession() {
+    const saved = localStorage.getItem("falcon_user");
+    if (saved) {
+      const user = JSON.parse(saved);
+      currentEmail = user.email;
+      
       try {
-        const response = await fetch(SCRIPT_URL, {
+        const res = await fetch(APPS_SCRIPT_URL, {
           method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ action: "getDashboardData", email: currentEmail, playerCode: currentCode })
+          body: JSON.stringify({
+            action: "getDashboardData",
+            email: currentEmail
+          })
         });
-        const result = await response.json();
-        if (result.status === "success") {
-          renderNews(result.news || []);
-          renderCases(result.cases || []);
+        const data = await res.json();
+        if (data.status === "success") {
+          loadDashboard(data);
         }
       } catch (e) {
-        console.error("خطأ في جلب البيانات:", e);
+        console.log("فشل تجديد الجلسة تلقائياً");
       }
     }
-
-    function renderNews(newsList) {
-      const container = document.getElementById("newsContainer");
-      if (!newsList || newsList.length === 0) {
-        container.innerHTML = `<div style="background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-sub); padding: 12px; border-radius: 8px; font-size: 12px; text-align: center;">لا توجد أخبار جديدة حالياً.</div>`;
-        return;
-      }
-      container.innerHTML = newsList.map(item => `
-        <div style="background: var(--input-bg); border: 1px solid var(--border-color); border-right: 4px solid var(--accent); padding: 12px 14px; border-radius: 10px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span style="background: rgba(16, 185, 129, 0.2); color: var(--accent); font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: bold;">${item.badge || 'تحديث'}</span>
-            <span style="color: var(--text-sub); font-size: 11px;">${item.date || ''}</span>
-          </div>
-          <h4 style="color: #fff; font-size: 14px; margin-bottom: 4px;">${item.title || ''}</h4>
-          <p style="color: #cbd5e1; font-size: 12px; line-height: 1.5;">${item.content || ''}</p>
-        </div>
-      `).join('');
-    }
-
-    function renderCases(casesList) {
-      const container = document.getElementById("casesContainer");
-      if (!casesList || casesList.length === 0) {
-        container.innerHTML = `
-          <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent); color: #34d399; padding: 12px; border-radius: 8px; font-size: 12px; text-align: center; font-weight: 600;">
-            ✅ السجل الجنائي نظيف - لا توجد قضايا مسجلة ضد كودك.
-          </div>`;
-        return;
-      }
-      container.innerHTML = casesList.map(c => `
-        <div style="background: var(--input-bg); border: 1px solid var(--border-color); border-right: 4px solid #ef4444; padding: 12px 14px; border-radius: 10px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span style="color: #f87171; font-weight: bold; font-size: 12px;">قضية ${c.caseNum || ''}</span>
-            <span style="background: rgba(239, 68, 68, 0.2); color: #ef4444; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: bold;">${c.status || 'قيد النظر'}</span>
-          </div>
-          <h4 style="color: #fff; font-size: 14px; margin-bottom: 4px;">${c.title || ''}</h4>
-          <p style="color: #cbd5e1; font-size: 12px; line-height: 1.5; margin-bottom: 6px;">${c.details || ''}</p>
-          <div style="color: #facc15; font-size: 12px;"><strong>العقوبة:</strong> ${c.penalty || 'لا يوجد'}</div>
-        </div>
-      `).join('');
-    }
-
-    function logout() {
-      localStorage.removeItem("falcon_session");
-      currentEmail = ""; currentIgn = ""; currentCode = "";
-      document.getElementById("signupForm").reset();
-      document.getElementById("loginForm").reset();
-      document.getElementById("otpForm").reset();
-      resetToStep1();
-      showAlert("تم تسجيل الخروج بنجاح.", "success");
-    }
-
-    function showStep(stepId) {
-      document.querySelectorAll(".form-step").forEach(step => step.classList.remove("active"));
-      document.getElementById(stepId).classList.add("active");
-    }
-
-    function resetToStep1() { showStep("step1"); hideAlert(); }
-    function copyIp() { navigator.clipboard.writeText("sqrmc.aternos.me:19423"); showAlert("تم نسخ الـ IP بنجاح!", "success"); }
-
-    function setLoading(btn, textSpan, spinner, isLoading, text) {
-      btn.disabled = isLoading;
-      textSpan.textContent = text;
-      spinner.style.display = isLoading ? "inline-block" : "none";
-    }
-
-    function showAlert(msg, type) {
-      const box = document.getElementById("alertBox");
-      box.textContent = msg;
-      box.className = "alert " + (type === "success" ? "alert-success" : "alert-error");
-      box.style.display = "block";
-    }
-
-    function hideAlert() { document.getElementById("alertBox").style.display = "none"; }
-
-    /* =========================================================
-       🛠️ المحرك المعدل بالكامل: إصلاح الكاميرات والرسائل الفورية
-       ========================================================= */
-
-    let myPeer = null;
-    let connections = {};
-    let pendingMessages = {};
-    let activeCall = null;
-    let localStream = null;
-    let activePeerId = null;
-
-    let contacts = JSON.parse(localStorage.getItem("falcon_contacts")) || {}; 
-    let chatHistories = JSON.parse(localStorage.getItem("falcon_chats")) || {};
-
-    let myProfile = {
-      name: localStorage.getItem("falcon_chat_name") || "لاعب Falcon",
-      avatar: localStorage.getItem("falcon_chat_avatar") || "https://api.dicebear.com/7.x/bottts/svg?seed=" + Math.random(),
-      code: ""
-    };
-
-    function initRealPeer() {
-      let savedPeerId = localStorage.getItem("falcon_real_peer_id");
-      if (!savedPeerId) {
-        savedPeerId = "fl-" + Math.floor(100000 + Math.random() * 900000);
-        localStorage.setItem("falcon_real_peer_id", savedPeerId);
-      }
-      connectToPeerServer(savedPeerId);
-    }
-
-    function connectToPeerServer(peerId) {
-      document.getElementById("myChatCode").textContent = "جاري الاتصال...";
-
-      if (myPeer) {
-        try { myPeer.destroy(); } catch(e){}
-      }
-
-      // إضافة سيرفرات STUN متعددة لضمان فتح الكاميرات والرسائل عبر مختلف شبكات الإنترنت
-      myPeer = new Peer(peerId, {
-        config: {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' },
-            { urls: 'stun:stun2.l.google.com:19302' },
-            { urls: 'stun:stun3.l.google.com:19302' },
-            { urls: 'stun:stun4.l.google.com:19302' },
-            { urls: 'stun:stun.services.mozilla.com' },
-            { urls: 'stun:global.stun.twilio.com:3478' }
-          ]
-        }
-      });
-
-      myPeer.on('open', (id) => {
-        myProfile.code = id;
-        localStorage.setItem("falcon_real_peer_id", id);
-        document.getElementById("myChatCode").textContent = id;
-        updateProfileUI();
-        renderContactsList();
-      });
-
-      myPeer.on('error', (err) => {
-        if (err.type === 'unavailable-id') {
-          const newId = "fl-" + Math.floor(100000 + Math.random() * 900000);
-          localStorage.setItem("falcon_real_peer_id", newId);
-          connectToPeerServer(newId);
-        } else {
-          document.getElementById("myChatCode").innerHTML = `<span style="color:#ef4444; font-size:11px;">خطأ بالاتصال</span> <button class="copy-btn" style="padding:1px 4px; font-size:9px;" onclick="initRealPeer()">تحديث</button>`;
-        }
-      });
-
-      // استقبال اتصال الشات النصي
-      myPeer.on('connection', (conn) => {
-        setupConnection(conn);
-      });
-
-      // استقبال المكالمات المرئية والصوتية
-      myPeer.on('call', async (call) => {
-        const callerName = contacts[call.peer]?.name || call.peer;
-        if (confirm(`📞 مكالمة واردة من (${callerName})! هل تريد الرد؟`)) {
-          try {
-            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            
-            const localVid = document.getElementById("localVideo");
-            localVid.srcObject = localStream;
-            localVid.play().catch(e => console.log(e));
-
-            document.getElementById("callOverlay").classList.add("active");
-            document.getElementById("callStatusText").textContent = `متصل بمكالمة مع ${callerName} 🟢`;
-
-            call.answer(localStream);
-            activeCall = call;
-
-            call.on('stream', (remoteStream) => {
-              const remoteVid = document.getElementById("remoteVideo");
-              remoteVid.srcObject = remoteStream;
-              remoteVid.play().catch(e => console.log("خطأ تشغيل فيديو الصديق:", e));
-            });
-          } catch (err) {
-            alert("تأكد من السماح بإذن الكاميرا والميكروفون من المتصفح!");
-          }
-        }
-      });
-    }
-
-    function setupConnection(conn) {
-      connections[conn.peer] = conn;
-
-      conn.on('open', () => {
-        connections[conn.peer] = conn;
-
-        // إرسال الرسائل المعلقة
-        if (pendingMessages[conn.peer] && pendingMessages[conn.peer].length > 0) {
-          pendingMessages[conn.peer].forEach(msgText => {
-            conn.send({ type: 'msg', text: msgText, senderName: myProfile.name });
-          });
-          pendingMessages[conn.peer] = [];
-        }
-
-        if (!contacts[conn.peer]) {
-          contacts[conn.peer] = {
-            id: conn.peer,
-            name: "لاعب " + conn.peer,
-            avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=" + conn.peer,
-            lastMsg: "متصل الآن 🟢"
-          };
-          saveContacts();
-        }
-        
-        conn.send({ type: 'profile', name: myProfile.name, avatar: myProfile.avatar });
-        renderContactsList();
-      });
-
-      conn.on('data', (data) => {
-        if (data.type === 'msg') {
-          saveMessage(conn.peer, data.text, 'incoming', data.senderName);
-          if (activePeerId === conn.peer) {
-            appendMessageUI(data.text, 'incoming', data.senderName);
-          }
-        } else if (data.type === 'profile') {
-          if (!contacts[conn.peer]) contacts[conn.peer] = { id: conn.peer };
-          contacts[conn.peer].name = data.name;
-          contacts[conn.peer].avatar = data.avatar;
-          saveContacts();
-          renderContactsList();
-          if (activePeerId === conn.peer) {
-            document.getElementById("activePeerName").textContent = data.name;
-            document.getElementById("activeContactAvatar").src = data.avatar;
-          }
-        }
-      });
-
-      conn.on('close', () => {
-        delete connections[conn.peer];
-        renderContactsList();
-      });
-    }
-
-    function addNewContact() {
-      const peerId = document.getElementById("peerIdInput").value.trim();
-      if (!peerId) return alert("يرجى إدخال الرقم الخاص بالشخص!");
-      if (peerId === myProfile.code) return alert("لا يمكنك إضافة نفسك!");
-
-      if (!contacts[peerId]) {
-        contacts[peerId] = {
-          id: peerId,
-          name: "صديق " + peerId,
-          avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=" + peerId,
-          lastMsg: "لم تبدأ المحادثة بعد"
-        };
-        saveContacts();
-      }
-
-      if (!connections[peerId] || !connections[peerId].open) {
-        const conn = myPeer.connect(peerId, { reliable: true });
-        setupConnection(conn);
-      }
-
-      document.getElementById("peerIdInput").value = "";
-      renderContactsList();
-      selectContact(peerId);
-    }
-
-    function selectContact(peerId) {
-      activePeerId = peerId;
-      const contact = contacts[peerId];
-
-      document.getElementById("activePeerName").textContent = contact ? contact.name : peerId;
-      document.getElementById("activePeerId").textContent = "الرقم الخاص: " + peerId;
-      
-      const avatarImg = document.getElementById("activeContactAvatar");
-      avatarImg.src = contact ? contact.avatar : "https://api.dicebear.com/7.x/bottts/svg?seed=" + peerId;
-      avatarImg.style.display = "block";
-
-      if (!connections[peerId] || !connections[peerId].open) {
-        const conn = myPeer.connect(peerId, { reliable: true });
-        setupConnection(conn);
-      }
-
-      renderContactsList();
-      loadChatHistory(peerId);
-    }
-
-    function renderContactsList() {
-      const container = document.getElementById("contactsListContainer");
-      const list = Object.values(contacts);
-
-      if (list.length === 0) {
-        container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-sub); font-size: 12px;">لا توجد محادثات. أضف صديقاً باستخدام رقمه الخاص أعلاه!</div>`;
-        return;
-      }
-
-      container.innerHTML = list.map(c => {
-        const isConnected = connections[c.id] && connections[c.id].open;
-        const isActive = c.id === activePeerId;
-        return `
-          <div class="contact-item ${isActive ? 'active' : ''}" onclick="selectContact('${c.id}')">
-            <img src="${c.avatar}">
-            <div class="contact-info">
-              <h5>${c.name} ${isConnected ? '🟢' : '⚪'}</h5>
-              <p>${c.lastMsg || 'اضغط لبدء المحادثة'}</p>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function saveMessage(peerId, text, type, sender) {
-      if (!chatHistories[peerId]) chatHistories[peerId] = [];
-      chatHistories[peerId].push({ text, type, sender, time: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) });
-      
-      if (contacts[peerId]) {
-        contacts[peerId].lastMsg = text;
-        saveContacts();
-      }
-      localStorage.setItem("falcon_chats", JSON.stringify(chatHistories));
-      renderContactsList();
-    }
-
-    function loadChatHistory(peerId) {
-      const container = document.getElementById("chatMessages");
-      container.innerHTML = "";
-
-      const history = chatHistories[peerId] || [];
-      if (history.length === 0) {
-        container.innerHTML = `<div style="text-align: center; color: var(--text-sub); margin-top: 40px; font-size: 12px;">أهلاً! ابدأ بكتابة رسالتك الأولى إلى هذا الصديق. 💬</div>`;
-        return;
-      }
-
-      history.forEach(msg => {
-        appendMessageUI(msg.text, msg.type, msg.sender);
-      });
-    }
-
-    // إرسال الرسالة فوراً في الشاشة وإرسالها برمجياً
-    function sendRealMessage() {
-      const input = document.getElementById("chatInput");
-      const text = input.value.trim();
-      if (!text) return;
-      if (!activePeerId) return alert("اختر جهة اتصال من القائمة أولاً!");
-
-      // 1. عرض الرسالة فوراً في الشاشة وحفظها
-      saveMessage(activePeerId, text, 'outgoing', 'أنت');
-      appendMessageUI(text, 'outgoing', 'أنت');
-      input.value = "";
-
-      // 2. إرسال عبر الشبكة
-      let conn = connections[activePeerId];
-
-      if (conn && conn.open) {
-        conn.send({ type: 'msg', text: text, senderName: myProfile.name });
-      } else {
-        if (!pendingMessages[activePeerId]) pendingMessages[activePeerId] = [];
-        pendingMessages[activePeerId].push(text);
-
-        if (!conn || !conn.open) {
-          conn = myPeer.connect(activePeerId, { reliable: true });
-          setupConnection(conn);
-        }
-      }
-    }
-
-    function appendMessageUI(text, type, sender) {
-      const container = document.getElementById("chatMessages");
-      
-      if (container.children.length === 1 && container.children[0].tagName === 'DIV' && container.children[0].style.textAlign === 'center') {
-        container.innerHTML = "";
-      }
-
-      const bubble = document.createElement("div");
-      bubble.className = `msg-bubble ${type === 'outgoing' ? 'msg-outgoing' : 'msg-incoming'}`;
-      bubble.innerHTML = `<strong style="display:block; font-size:10px; opacity:0.8;">${sender}</strong>${text}`;
-      container.appendChild(bubble);
-      container.scrollTop = container.scrollHeight;
-    }
-
-    // بدء المكالمة وإظهار الكاميرا فوراً للطرفين
-    async function startRealCall(hasVideo) {
-      if (!activePeerId) return alert("اختر شخصاً من المحادثات أولاً للاتصال به!");
-
-      try {
-        localStream = await navigator.mediaDevices.getUserMedia({ video: hasVideo, audio: true });
-        
-        const localVid = document.getElementById("localVideo");
-        localVid.srcObject = localStream;
-        localVid.play().catch(e => console.log(e));
-
-        document.getElementById("callOverlay").classList.add("active");
-        
-        const contactName = contacts[activePeerId]?.name || activePeerId;
-        document.getElementById("callStatusText").textContent = `جاري الرن على ${contactName}... 📲`;
-
-        const call = myPeer.call(activePeerId, localStream);
-        activeCall = call;
-
-        call.on('stream', (remoteStream) => {
-          document.getElementById("callStatusText").textContent = `تم الرد - مكالمة متصلة 🟢`;
-          const remoteVid = document.getElementById("remoteVideo");
-          remoteVid.srcObject = remoteStream;
-          remoteVid.play().catch(e => console.log("خطأ تشغيل فيديو الطرف الآخر:", e));
-        });
-      } catch (e) {
-        alert("يرجى التأكد من إعطاء إذن الكاميرا والميكروفون في المتصفح وتجربة فتح الموقع برابط آمن (HTTPS أو localhost).");
-      }
-    }
-
-    function endCall() {
-      if (activeCall) activeCall.close();
-      if (localStream) localStream.getTracks().forEach(track => track.stop());
-      document.getElementById("callOverlay").classList.remove("active");
-    }
-
-    function saveContacts() {
-      localStorage.setItem("falcon_contacts", JSON.stringify(contacts));
-    }
-
-    function copyMyCode() {
-      if (!myProfile.code || myProfile.code.includes("جاري")) {
-        return alert("انتظر لحين اكتمال توليد الرقم الخاص بك!");
-      }
-      navigator.clipboard.writeText(myProfile.code);
-      showAlert("تم نسخ رقم الـ Peer الخاص بك!", "success");
-    }
-
-    function toggleSidebar() {
-      document.getElementById("sidebar").classList.toggle("active");
-      document.getElementById("sidebarOverlay").classList.toggle("active");
-    }
-    function closeSidebar() {
-      document.getElementById("sidebar").classList.remove("active");
-      document.getElementById("sidebarOverlay").classList.remove("active");
-    }
-
-    function openChatModal() { document.getElementById("chatModalOverlay").classList.add("active"); }
-    function closeChatModal() { document.getElementById("chatModalOverlay").classList.remove("active"); }
-
-    function toggleEditProfile(show) {
-      const modal = document.getElementById("editProfileModal");
-      if (show) {
-        document.getElementById("editNameInput").value = myProfile.name;
-        document.getElementById("editAvatarUrl").value = myProfile.avatar;
-        document.getElementById("avatarPreview").src = myProfile.avatar;
-        modal.classList.add("active");
-      } else {
-        modal.classList.remove("active");
-      }
-    }
-
-    function handleFileSelect(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const base64Image = e.target.result;
-          document.getElementById("avatarPreview").src = base64Image;
-          document.getElementById("editAvatarUrl").value = base64Image;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    function saveProfileChanges() {
-      const newName = document.getElementById("editNameInput").value.trim();
-      const newAvatar = document.getElementById("editAvatarUrl").value.trim();
-
-      if (newName) myProfile.name = newName;
-      if (newAvatar) myProfile.avatar = newAvatar;
-
-      localStorage.setItem("falcon_chat_name", myProfile.name);
-      localStorage.setItem("falcon_chat_avatar", myProfile.avatar);
-
-      updateProfileUI();
-      toggleEditProfile(false);
-      showAlert("تم حفظ البيانات بنجاح! ✨", "success");
-
-      Object.values(connections).forEach(conn => {
-        if (conn && conn.open) {
-          conn.send({ type: 'profile', name: myProfile.name, avatar: myProfile.avatar });
-        }
-      });
-    }
-
-    function updateProfileUI() {
-      document.getElementById("myChatName").textContent = myProfile.name;
-      document.getElementById("myChatAvatar").src = myProfile.avatar;
-    }
-
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', e => {
-      if (e.keyCode === 123 || 
-         (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
-         (e.ctrlKey && e.keyCode === 85)) {
-        e.preventDefault();
-        return false;
-      }
-    });
-  </script>
+  }
+
+  function resetAuthForm() {
+    document.getElementById("otpReqForm").classList.remove("hidden");
+    document.getElementById("otpVerifyForm").classList.add("hidden");
+    hideAlert();
+  }
+
+  function logout() {
+    localStorage.removeItem("falcon_user");
+    localStorage.removeItem("falcon_real_peer_id");
+    location.reload();
+  }
+</script>
 </body>
 </html>
