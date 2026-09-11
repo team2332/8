@@ -18,7 +18,7 @@
       --border: #334155;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; user-select: none; }
     body { background-color: var(--bg-main); color: var(--text); padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
     
     .container { width: 100%; max-width: 900px; }
@@ -28,7 +28,7 @@
     
     .form-group { margin-bottom: 15px; }
     label { display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 0.9rem; }
-    input, textarea { width: 100%; padding: 12px; background: #1e293b; border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 1rem; outline: none; }
+    input, textarea { width: 100%; padding: 12px; background: #1e293b; border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 1rem; outline: none; user-select: text; }
     input:focus, textarea:focus { border-color: var(--accent); }
     
     .btn { width: 100%; padding: 12px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
@@ -43,7 +43,6 @@
     .tab-btn { flex: 1; padding: 10px; background: #1e293b; color: var(--text-muted); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: bold; }
     .tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-    /* بطاقة الهوية الرقمية */
     .id-card { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 2px solid var(--accent); border-radius: 12px; padding: 20px; }
     .id-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; }
     .id-card-body { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; }
@@ -61,14 +60,18 @@
     .hidden { display: none !important; }
     .alert { padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; text-align: center; }
     .alert-error { background: #7f1d1d; color: #fca5a5; }
+    
+    #loadingOverlay { text-align: center; padding: 20px; font-weight: bold; color: var(--accent); }
   </style>
 </head>
 <body>
 
 <div class="container">
   
+  <div id="loadingOverlay" class="card">جاري تحميل البيانات والجلسة...</div>
+
   <!-- تسجيل الدخول وإنشاء الحساب -->
-  <div id="authContainer" class="card">
+  <div id="authContainer" class="card hidden">
     <h1 class="brand-title">🎮 Falcon MC</h1>
     
     <div class="tabs">
@@ -152,17 +155,15 @@
     <!-- القسم المخفي لحين الديسكورد -->
     <div id="lockedDataSection" class="hidden">
       
-      <!-- قسم الأخبار والإعلانات -->
       <div class="section-box">
         <h3>📢 آخر الأخبار والإعلانات</h3>
         <div id="newsList" style="margin-top: 10px;">لا توجد أخبار حالياً.</div>
       </div>
 
-      <!-- قسم بلاغات الطوارئ للمواطن -->
       <div class="section-box">
         <h3>🚨 طلب طوارئ (شرطة / إسعاف)</h3>
         <div class="form-group" style="margin-top: 10px;">
-          <input type="text" id="emergencyLocation" placeholder="اكتب موقعك الحادي أو الإحداثيات...">
+          <input type="text" id="emergencyLocation" placeholder="اكتب موقعك الحالي أو الإحداثيات...">
         </div>
         <div class="emergency-grid">
           <button class="btn btn-danger" onclick="callEmergency('شرطة 👮‍♂️')">طلب الشرطة</button>
@@ -173,7 +174,6 @@
         <div id="myEmergenciesList" style="margin-top: 10px;">لا توجد بلاغات مسجلة باسمك.</div>
       </div>
 
-      <!-- قسم للشرطي فقط (يظهر إذا كانت الوظيفة شرطة) -->
       <div id="policePanel" class="section-box hidden" style="border-color: var(--primary);">
         <h3 style="color: #60a5fa;">👮‍♂️ غرفة عمليات الشرطة (خاص بالضباط)</h3>
         <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">يمكنك كشرطي الرد مباشرة على بلاغات المواطنين وتحديث حالتها.</p>
@@ -187,11 +187,79 @@
 </div>
 
 <script>
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-dIJJ8rjiwbt-ZFk3qjSYv6UjoUKC6PXydut-lvR6VYUepOj15o9Db7Dr1hIjSMrLFw/exec";
+  // 🚫 --- 1. حماية ومنع فتح الكونسول وقائمة الكليك الأيمن ---
+  document.addEventListener('contextmenu', e => e.preventDefault());
+
+  document.addEventListener('keydown', function(e) {
+    // منع F12
+    if (e.keyCode === 123 || e.key === "F12") {
+      e.preventDefault();
+      return false;
+    }
+    // منع Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
+      e.preventDefault();
+      return false;
+    }
+    // منع Ctrl+U (سورس الكود)
+    if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
+      e.preventDefault();
+      return false;
+    }
+  });
+
+
+  // ⚙️ --- 2. إعدادات النظام والجلسة المستمرة ---
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec";
 
   let isLoginMode = false;
   let currentEmail = "";
   let userProfile = {};
+
+  // التحقق التلقائي عند فتح الصفحة أو الـ Refresh
+  window.addEventListener('DOMContentLoaded', checkSavedSession);
+
+  async function checkSavedSession() {
+    const saved = localStorage.getItem("falcon_user_data");
+    if (!saved) {
+      showAuthScreen();
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(saved);
+      if (!parsed.email) {
+        showAuthScreen();
+        return;
+      }
+
+      currentEmail = parsed.email;
+
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "getDashboardData",
+          email: currentEmail
+        })
+      });
+
+      const data = await res.json();
+      if (data.status === "success") {
+        userProfile = data;
+        loadDashboard(data);
+      } else {
+        localStorage.removeItem("falcon_user_data");
+        showAuthScreen();
+      }
+    } catch (e) {
+      showAuthScreen();
+    }
+  }
+
+  function showAuthScreen() {
+    document.getElementById("loadingOverlay").classList.add("hidden");
+    document.getElementById("authContainer").classList.remove("hidden");
+  }
 
   function showAlert(msg) {
     const el = document.getElementById("alertMsg");
@@ -288,17 +356,16 @@
   }
 
   function loadDashboard(data) {
+    document.getElementById("loadingOverlay").classList.add("hidden");
     document.getElementById("authContainer").classList.add("hidden");
     document.getElementById("dashboardContainer").classList.remove("hidden");
 
-    // بطاقة الهوية
     document.getElementById("cardFullName").innerText = data.fullName || "غير مسجل";
     document.getElementById("cardIgn").innerText = data.ign || "---";
     document.getElementById("cardPlayerCode").innerText = data.playerCode || "---";
     document.getElementById("cardLevel").innerText = data.level || "1";
     document.getElementById("cardJob").innerText = data.job || "مواطن";
 
-    // عرض الأخبار
     const newsBox = document.getElementById("newsList");
     if (data.news && data.news.length > 0) {
       newsBox.innerHTML = data.news.map(item => `
@@ -313,16 +380,13 @@
       newsBox.innerHTML = "<p style='color:var(--text-muted);'>لا توجد أخبار جديدة.</p>";
     }
 
-    // عرض بلاغات المواطن الخاصة
     renderMyEmergencies(data.myEmergencies || []);
 
-    // إذا كان المستخدم شرطي، نقوم بإظهار لوحة تحكم الشرطة
     if (data.isPolice) {
       document.getElementById("policePanel").classList.remove("hidden");
       renderPolicePanel(data.allEmergenciesForPolice || []);
     }
 
-    // فتح قفل البيانات إذا كان موثق ديسكورد
     if (localStorage.getItem("discord_verified") === "true") {
       document.getElementById("discordGate").classList.add("hidden");
       document.getElementById("lockedDataSection").classList.remove("hidden");
@@ -367,7 +431,7 @@
         
         <div style="margin-top:10px; background:#0f172a; padding:10px; border-radius:6px;">
           <label style="font-size:0.8rem; color:var(--text-muted);">الرد على المواطن:</label>
-          <input type="text" id="reply_input_${item.rowId}" value="${item.response !== 'لم يتم الرد بعد' ? item.response : ''}" placeholder="اكتب رد الشرطة (مثال: الدوريات في الطريق إليك)...">
+          <input type="text" id="reply_input_${item.rowId}" value="${item.response !== 'لم يتم الرد بعد' ? item.response : ''}" placeholder="اكتب رد الشرطة...">
           <button class="btn btn-police" style="padding:6px; font-size:0.85rem;" onclick="submitPoliceReply(${item.rowId})">إرسال الرد وتحديث الحالة</button>
         </div>
       </div>
@@ -437,6 +501,7 @@
 
   function logout() {
     localStorage.removeItem("falcon_user_data");
+    localStorage.removeItem("discord_verified");
     location.reload();
   }
 </script>
