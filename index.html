@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Falcon MC - لوحة الهوية الرقمية</title>
+  <title>Falcon MC - لوحة التحكم والبلاغات</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -21,39 +21,41 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
     body { background-color: var(--bg-main); color: var(--text); padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
     
-    .container { width: 100%; max-width: 850px; }
+    .container { width: 100%; max-width: 900px; }
     .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 20px; }
     
     .brand-title { color: var(--accent); text-align: center; font-size: 2rem; margin-bottom: 20px; }
     
     .form-group { margin-bottom: 15px; }
     label { display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 0.9rem; }
-    input { width: 100%; padding: 12px; background: #1e293b; border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 1rem; outline: none; }
-    input:focus { border-color: var(--accent); }
+    input, textarea { width: 100%; padding: 12px; background: #1e293b; border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 1rem; outline: none; }
+    input:focus, textarea:focus { border-color: var(--accent); }
     
     .btn { width: 100%; padding: 12px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
     .btn:hover { opacity: 0.9; }
     .btn-secondary { background: #475569; }
     .btn-danger { background: var(--danger); }
     .btn-warning { background: var(--warning); color: #000; }
+    .btn-police { background: #1d4ed8; color: #fff; }
     .btn-discord { background: #5865F2; }
 
     .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
     .tab-btn { flex: 1; padding: 10px; background: #1e293b; color: var(--text-muted); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: bold; }
     .tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-    /* تصميم بطاقة كشف الهوية الوطنية */
-    .id-card { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 2px solid var(--accent); border-radius: 12px; padding: 20px; position: relative; overflow: hidden; }
+    /* بطاقة الهوية الرقمية */
+    .id-card { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 2px solid var(--accent); border-radius: 12px; padding: 20px; }
     .id-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; }
     .id-card-body { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; }
-    .id-field { margin-bottom: 8px; }
     .id-field span { display: block; font-size: 0.75rem; color: var(--text-muted); }
     .id-field strong { font-size: 1.1rem; color: #fff; }
 
-    /* قسم الطوارئ */
-    .emergency-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+    .section-box { background: #111827; border: 1px solid var(--border); padding: 18px; border-radius: 12px; margin-top: 20px; }
+    .list-item { background: #1e293b; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-right: 4px solid var(--accent); }
+    .police-item { border-right-color: var(--primary); }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; background: var(--primary); color: #fff; margin-bottom: 5px; }
 
-    /* قفل الديسكورد الإجباري */
+    .emergency-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
     .discord-overlay { background: rgba(15, 23, 42, 0.95); border: 2px dashed #5865F2; border-radius: 12px; padding: 30px; text-align: center; margin-top: 20px; }
 
     .hidden { display: none !important; }
@@ -65,7 +67,7 @@
 
 <div class="container">
   
-  <!-- نموذج الدخول والتسجيل -->
+  <!-- تسجيل الدخول وإنشاء الحساب -->
   <div id="authContainer" class="card">
     <h1 class="brand-title">🎮 Falcon MC</h1>
     
@@ -79,7 +81,7 @@
     <form id="otpReqForm" onsubmit="handleSendOtp(event)">
       <div id="signupFields">
         <div class="form-group">
-          <label for="fullName">الاسم الحقيقي الثلاثي/الثنائي (مطلوب)</label>
+          <label for="fullName">الاسم الحقيقي الثلاثي (مطلوب)</label>
           <input type="text" id="fullName" placeholder="مثال: أحمد محمد علي">
         </div>
         <div class="form-group">
@@ -110,70 +112,72 @@
     </form>
   </div>
 
-  <!-- لوحة التحكم وكشف الهوية -->
+  <!-- لوحة التحكم -->
   <div id="dashboardContainer" class="card hidden">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <h2>لوحة التحكم والمواطنة</h2>
+      <h2>لوحة الهوية والخدمات</h2>
       <button class="btn btn-secondary" style="width: auto; padding: 5px 15px;" onclick="logout()">خروج</button>
     </div>
 
-    <!-- 2. كشف الهوية الرقمية -->
+    <!-- بطاقة الهوية الرقمية -->
     <div class="id-card">
       <div class="id-card-header">
-        <span style="font-weight: bold; color: var(--accent);">🪪 بطاقة هوية المواطن</span>
-        <span id="cardStatus" style="font-size: 0.8rem; background: var(--accent); padding: 2px 8px; border-radius: 4px; color: #000; font-weight: bold;">مفعل</span>
+        <span style="font-weight: bold; color: var(--accent);">🪪 بطاقة الهوية الوطنية</span>
+        <span style="font-size: 0.8rem; background: var(--accent); padding: 2px 8px; border-radius: 4px; color: #000; font-weight: bold;">مفعل</span>
       </div>
       <div class="id-card-body">
         <div>
-          <div class="id-field">
-            <span>الاسم الحقيقي:</span>
-            <strong id="cardFullName">---</strong>
-          </div>
-          <div class="id-field">
-            <span>اسم اللعبة (IGN):</span>
-            <strong id="cardIgn">---</strong>
-          </div>
-          <div class="id-field">
-            <span>كود الهوية (Player Code):</span>
-            <strong id="cardPlayerCode" style="color: var(--primary);">---</strong>
-          </div>
+          <div class="id-field"><span>الاسم الحقيقي:</span><strong id="cardFullName">---</strong></div>
+          <div class="id-field"><span>اسم اللعبة (IGN):</span><strong id="cardIgn">---</strong></div>
+          <div class="id-field"><span>كود اللاعب:</span><strong id="cardPlayerCode" style="color: var(--primary);">---</strong></div>
         </div>
         <div style="border-right: 1px solid var(--border); padding-right: 15px;">
-          <!-- 1. المستوى والوظيفة -->
-          <div class="id-field">
-            <span>المستوى (Level):</span>
-            <strong id="cardLevel" style="color: var(--warning); font-size: 1.4rem;">1</strong>
-          </div>
-          <div class="id-field">
-            <span>الوظيفة الحالية:</span>
-            <strong id="cardJob" style="color: var(--accent);">مواطن</strong>
-          </div>
+          <div class="id-field"><span>المستوى:</span><strong id="cardLevel" style="color: var(--warning); font-size: 1.4rem;">1</strong></div>
+          <div class="id-field"><span>الوظيفة:</span><strong id="cardJob" style="color: var(--accent);">مواطن</strong></div>
         </div>
       </div>
     </div>
 
-    <!-- 7. قفل الديسكورد الإجباري -->
+    <!-- قفل الديسكورد الإجباري -->
     <div id="discordGate" class="discord-overlay">
       <h3 style="color: #5865F2; margin-bottom: 10px;">🔒 يجب الانضمام لسيرفر الديسكورد</h3>
       <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">
-        لرؤية باقي بياناتك والوصول لخدمات الطوارئ والسيرفر، يجب عليك الانضمام أولاً لسيرفر الديسكورد الخاص بنا.
+        لرؤية باقي الأخبار والخدمات وبلاغات الشرطة، يجب عليك الانضمام أولاً لسيرفر الديسكورد.
       </p>
       <a href="https://discord.gg/YOUR_DISCORD_LINK" target="_blank" class="btn btn-discord" style="display: inline-block; text-decoration: none; width: auto; padding: 10px 25px;" onclick="unlockDiscordData()">
         الانضمام للديسكورد وتأكيد الحساب
       </a>
     </div>
 
-    <!-- باقي البيانات (مخفية لحين تأكيد الديسكورد) -->
-    <div id="lockedDataSection" class="hidden" style="margin-top: 20px;">
+    <!-- القسم المخفي لحين الديسكورد -->
+    <div id="lockedDataSection" class="hidden">
       
-      <!-- 3. الاتصال بالشرطة والإسعاف -->
-      <h3 style="margin-bottom: 10px;">🚨 مركز الطوارئ والنداء</h3>
-      <div class="form-group">
-        <input type="text" id="emergencyLocation" placeholder="اكتب موقعك في الخريطة أو الإحداثيات...">
+      <!-- قسم الأخبار والإعلانات -->
+      <div class="section-box">
+        <h3>📢 آخر الأخبار والإعلانات</h3>
+        <div id="newsList" style="margin-top: 10px;">لا توجد أخبار حالياً.</div>
       </div>
-      <div class="emergency-grid">
-        <button class="btn btn-danger" onclick="callEmergency('شرطة 👮‍♂️')">الاتصال بالشرطة</button>
-        <button class="btn btn-warning" onclick="callEmergency('إسعاف 🚑')">الاتصال بالإسعاف</button>
+
+      <!-- قسم بلاغات الطوارئ للمواطن -->
+      <div class="section-box">
+        <h3>🚨 طلب طوارئ (شرطة / إسعاف)</h3>
+        <div class="form-group" style="margin-top: 10px;">
+          <input type="text" id="emergencyLocation" placeholder="اكتب موقعك الحادي أو الإحداثيات...">
+        </div>
+        <div class="emergency-grid">
+          <button class="btn btn-danger" onclick="callEmergency('شرطة 👮‍♂️')">طلب الشرطة</button>
+          <button class="btn btn-warning" onclick="callEmergency('إسعاف 🚑')">طلب الإسعاف</button>
+        </div>
+
+        <h4 style="margin-top: 20px; color: var(--text-muted);">سجل بلاغاتك السابقة وردود الشرطة:</h4>
+        <div id="myEmergenciesList" style="margin-top: 10px;">لا توجد بلاغات مسجلة باسمك.</div>
+      </div>
+
+      <!-- قسم للشرطي فقط (يظهر إذا كانت الوظيفة شرطة) -->
+      <div id="policePanel" class="section-box hidden" style="border-color: var(--primary);">
+        <h3 style="color: #60a5fa;">👮‍♂️ غرفة عمليات الشرطة (خاص بالضباط)</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">يمكنك كشرطي الرد مباشرة على بلاغات المواطنين وتحديث حالتها.</p>
+        <div id="policeEmergenciesList">لا توجد بلاغات نشطة من المواطنين.</div>
       </div>
 
     </div>
@@ -215,9 +219,8 @@
     const fullName = document.getElementById("fullName").value.trim();
     const ign = document.getElementById("ign").value.trim();
 
-    // 5. تأكيد الاسم الحقيقي
     if (!isLoginMode && fullName.split(" ").filter(Boolean).length < 2) {
-      return showAlert("يرجى كتابة اسمك الحقيقي الثنائي على الأقل لتأكيد الهوية.");
+      return showAlert("يرجى كتابة اسمك الحقيقي الثنائي على الأقل.");
     }
 
     const btn = document.getElementById("sendOtpBtn");
@@ -288,33 +291,92 @@
     document.getElementById("authContainer").classList.add("hidden");
     document.getElementById("dashboardContainer").classList.remove("hidden");
 
-    // ملء بيانات كشف الهوية
+    // بطاقة الهوية
     document.getElementById("cardFullName").innerText = data.fullName || "غير مسجل";
     document.getElementById("cardIgn").innerText = data.ign || "---";
     document.getElementById("cardPlayerCode").innerText = data.playerCode || "---";
     document.getElementById("cardLevel").innerText = data.level || "1";
     document.getElementById("cardJob").innerText = data.job || "مواطن";
 
-    // التأكد من حالة فتح بيانات الديسكورد
+    // عرض الأخبار
+    const newsBox = document.getElementById("newsList");
+    if (data.news && data.news.length > 0) {
+      newsBox.innerHTML = data.news.map(item => `
+        <div class="list-item">
+          <span class="badge">${item.badge}</span>
+          <strong style="display:block; margin: 2px 0;">${item.title}</strong>
+          <p style="font-size:0.9rem; color:var(--text-muted);">${item.content}</p>
+          <small style="color:#64748b; display:block; margin-top:5px;">${item.date}</small>
+        </div>
+      `).join("");
+    } else {
+      newsBox.innerHTML = "<p style='color:var(--text-muted);'>لا توجد أخبار جديدة.</p>";
+    }
+
+    // عرض بلاغات المواطن الخاصة
+    renderMyEmergencies(data.myEmergencies || []);
+
+    // إذا كان المستخدم شرطي، نقوم بإظهار لوحة تحكم الشرطة
+    if (data.isPolice) {
+      document.getElementById("policePanel").classList.remove("hidden");
+      renderPolicePanel(data.allEmergenciesForPolice || []);
+    }
+
+    // فتح قفل البيانات إذا كان موثق ديسكورد
     if (localStorage.getItem("discord_verified") === "true") {
       document.getElementById("discordGate").classList.add("hidden");
       document.getElementById("lockedDataSection").classList.remove("hidden");
     }
   }
 
-  // 7. إجبارية الانضمام للديسكورد لرؤية باقي البيانات
-  function unlockDiscordData() {
-    localStorage.setItem("discord_verified", "true");
-    setTimeout(() => {
-      document.getElementById("discordGate").classList.add("hidden");
-      document.getElementById("lockedDataSection").classList.remove("hidden");
-    }, 1500);
+  function renderMyEmergencies(list) {
+    const container = document.getElementById("myEmergenciesList");
+    if (!list || list.length === 0) {
+      container.innerHTML = "<p style='color:var(--text-muted); font-size: 0.85rem;'>لا توجد بلاغات سابقة.</p>";
+      return;
+    }
+    container.innerHTML = list.map(item => `
+      <div class="list-item">
+        <div style="display:flex; justify-content:space-between;">
+          <strong>نوع البلاغ: ${item.type}</strong>
+          <span style="color:var(--warning); font-size:0.85rem;">${item.status}</span>
+        </div>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">الموقع: ${item.location}</p>
+        <div style="background:#0f172a; padding:8px; border-radius:6px; margin-top:8px; font-size:0.85rem;">
+          <span style="color:var(--accent);">رد الشرطة/الإسعاف:</span> ${item.response}
+          ${item.officerName !== '---' ? `<br><small style='color:var(--text-muted);'>الضابط المسؤول: ${item.officerName}</small>` : ''}
+        </div>
+      </div>
+    `).join("");
   }
 
-  // 3. الاتصال بالطوارئ
+  function renderPolicePanel(list) {
+    const container = document.getElementById("policeEmergenciesList");
+    if (!list || list.length === 0) {
+      container.innerHTML = "<p style='color:var(--text-muted);'>لا توجد بلاغات مقدمة حالياً.</p>";
+      return;
+    }
+    container.innerHTML = list.map(item => `
+      <div class="list-item police-item">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong>بلاغ من: ${item.fullName} (${item.playerCode})</strong>
+          <span style="background:#1e3a8a; color:#93c5fd; padding:2px 8px; border-radius:4px; font-size:0.75rem;">${item.type}</span>
+        </div>
+        <p style="font-size:0.85rem; margin-top:5px;"><b>الموقع:</b> ${item.location}</p>
+        <p style="font-size:0.85rem; color:var(--text-muted);"><b>التاريخ:</b> ${item.date} | <b>الحالة:</b> ${item.status}</p>
+        
+        <div style="margin-top:10px; background:#0f172a; padding:10px; border-radius:6px;">
+          <label style="font-size:0.8rem; color:var(--text-muted);">الرد على المواطن:</label>
+          <input type="text" id="reply_input_${item.rowId}" value="${item.response !== 'لم يتم الرد بعد' ? item.response : ''}" placeholder="اكتب رد الشرطة (مثال: الدوريات في الطريق إليك)...">
+          <button class="btn btn-police" style="padding:6px; font-size:0.85rem;" onclick="submitPoliceReply(${item.rowId})">إرسال الرد وتحديث الحالة</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
   async function callEmergency(type) {
     const location = document.getElementById("emergencyLocation").value.trim();
-    if (!location) return alert("يرجى كتابة موقعك الحالي للإرسال للطوارئ!");
+    if (!location) return alert("يرجى كتابة الموقع لإرسال البلاغ!");
 
     try {
       const res = await fetch(APPS_SCRIPT_URL, {
@@ -330,9 +392,41 @@
       const data = await res.json();
       alert(data.message || "تم إرسال البلاغ!");
       document.getElementById("emergencyLocation").value = "";
+      location.reload();
     } catch (e) {
-      alert("فشل إرسال البلاغ، حاول مجدداً.");
+      alert("فشل الإرسال.");
     }
+  }
+
+  async function submitPoliceReply(rowId) {
+    const replyText = document.getElementById(`reply_input_${rowId}`).value.trim();
+    if (!replyText) return alert("يرجى كتابة الرد أولاً!");
+
+    try {
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "respondEmergency",
+          rowId: rowId,
+          responseText: replyText,
+          officerName: userProfile.fullName + " (" + userProfile.ign + ")",
+          newStatus: "تم الاستجابة 🟢"
+        })
+      });
+      const data = await res.json();
+      alert(data.message || "تم الرد بنجاح!");
+      location.reload();
+    } catch (e) {
+      alert("حدث خطأ أثناء إرسال الرد.");
+    }
+  }
+
+  function unlockDiscordData() {
+    localStorage.setItem("discord_verified", "true");
+    setTimeout(() => {
+      document.getElementById("discordGate").classList.add("hidden");
+      document.getElementById("lockedDataSection").classList.remove("hidden");
+    }, 1200);
   }
 
   function resetAuthForm() {
