@@ -3,597 +3,696 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Falcon MC - لوحة التحكم والبلاغات</title>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+  <title>Falcon MC - لوحة التحكم والقضايا</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-main: #0b0f19;
-      --bg-card: #151c2c;
-      --accent: #10b981;
-      --primary: #3b82f6;
-      --danger: #ef4444;
-      --warning: #f59e0b;
-      --text: #f3f4f6;
+      --bg-color: #0b0f19;
+      --card-bg: #161e2e;
+      --card-border: #233044;
+      --accent-green: #10b981;
+      --accent-blue: #3b82f6;
+      --accent-red: #ef4444;
+      --accent-yellow: #f59e0b;
+      --text-main: #f3f4f6;
       --text-muted: #9ca3af;
-      --border: #334155;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; user-select: none; }
-    body { background-color: var(--bg-main); color: var(--text); padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-    
-    .container { width: 100%; max-width: 900px; }
-    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 20px; }
-    
-    .brand-title { color: var(--accent); text-align: center; font-size: 2rem; margin-bottom: 20px; }
-    
-    .form-group { margin-bottom: 15px; }
-    label { display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 0.9rem; }
-    input, textarea { width: 100%; padding: 12px; background: #1e293b; border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 1rem; outline: none; user-select: text; }
-    input:focus, textarea:focus { border-color: var(--accent); }
-    
-    .btn { width: 100%; padding: 12px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding-bottom: 40px;
+    }
+
+    /* Modal / Auth Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(5, 7, 13, 0.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 30px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+
+    .modal-card h2 {
+      color: var(--accent-green);
+      margin-bottom: 15px;
+      font-size: 24px;
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 15px;
+      text-align: right;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      background: #0d131f;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s opacity;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
     .btn:hover { opacity: 0.9; }
-    .btn-secondary { background: #475569; }
-    .btn-danger { background: var(--danger); }
-    .btn-warning { background: var(--warning); color: #000; }
-    .btn-police { background: #1d4ed8; color: #fff; }
-    .btn-discord { background: #5865F2; }
+    .btn-primary { background: var(--accent-blue); color: #fff; }
+    .btn-success { background: var(--accent-green); color: #fff; }
+    .btn-danger { background: var(--accent-red); color: #fff; }
+    .btn-warning { background: var(--accent-yellow); color: #111; }
+    .btn-sm { width: auto; padding: 6px 12px; font-size: 13px; }
 
-    .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-    .tab-btn { flex: 1; padding: 10px; background: #1e293b; color: var(--text-muted); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: bold; }
-    .tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    /* Layout Header */
+    header {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--card-border);
+      padding: 15px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-    .id-card { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 2px solid var(--accent); border-radius: 12px; padding: 20px; }
-    .id-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; }
-    .id-card-body { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; }
-    .id-field span { display: block; font-size: 0.75rem; color: var(--text-muted); }
-    .id-field strong { font-size: 1.1rem; color: #fff; }
+    .logo {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent-green);
+    }
 
-    .section-box { background: #111827; border: 1px solid var(--border); padding: 18px; border-radius: 12px; margin-top: 20px; }
-    .list-item { background: #1e293b; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-right: 4px solid var(--accent); }
-    .police-item { border-right-color: var(--primary); }
-    .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; background: var(--primary); color: #fff; margin-bottom: 5px; }
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
 
-    .emergency-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
-    .discord-overlay { background: rgba(15, 23, 42, 0.95); border: 2px dashed #5865F2; border-radius: 12px; padding: 30px; text-align: center; margin-top: 20px; }
+    /* Main Container */
+    .container {
+      max-width: 1100px;
+      margin: 25px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 20px;
+    }
 
-    /* --- تصميم الشات والرسائل --- */
-    .chat-box { background: #0f172a; border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-top: 10px; }
-    .chat-messages { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 5px; }
-    .chat-msg { max-width: 80%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; line-height: 1.3; }
-    .chat-msg-police { background: #1d4ed8; color: #fff; align-self: flex-start; border-bottom-right-radius: 0; }
-    .chat-msg-citizen { background: #334155; color: #fff; align-self: flex-end; border-bottom-left-radius: 0; }
-    .chat-msg-system { background: #059669; color: #fff; align-self: center; text-align: center; font-size: 0.78rem; width: 100%; max-width: 100%; border-radius: 6px; }
-    .chat-sender-name { font-size: 0.7rem; opacity: 0.8; margin-bottom: 2px; display: block; font-weight: bold; }
-    .chat-input-container { display: flex; gap: 8px; margin-top: 8px; }
-    .chat-input-container input { flex: 1; padding: 8px 12px; font-size: 0.85rem; }
-    .chat-input-container button { width: auto; margin: 0; padding: 8px 15px; font-size: 0.85rem; }
+    @media (max-width: 768px) {
+      .container { grid-template-columns: 1fr; }
+    }
+
+    /* Sidebar & Profile Card */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card h3 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .profile-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px;
+      background: #0d131f;
+      border-radius: 6px;
+    }
+
+    /* News Section */
+    .news-item {
+      padding: 12px;
+      background: #0d131f;
+      border-right: 3px solid var(--accent-blue);
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .news-badge {
+      background: var(--accent-blue);
+      color: #fff;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 5px;
+    }
+
+    /* Emergency / Cases Cards */
+    .emergency-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-right: 4px solid var(--accent-blue);
+      transition: all 0.3s ease;
+    }
+
+    .emergency-card.status-closed {
+      border-right-color: var(--accent-red);
+      opacity: 0.85;
+    }
+
+    .emergency-card.status-active {
+      border-right-color: var(--accent-green);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+      background: #233044;
+    }
+
+    .controls-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+    }
+
+    /* Chat Section Inside Case */
+    .chat-container {
+      background: #0d131f;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 10px;
+    }
+
+    .chat-messages {
+      max-height: 180px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 5px;
+    }
+
+    .chat-bubble {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      max-width: 85%;
+    }
+
+    .chat-bubble.police-msg {
+      background: #1e3a8a;
+      color: #bfdbfe;
+      align-self: flex-start;
+    }
+
+    .chat-bubble.user-msg {
+      background: #334155;
+      color: #f1f5f9;
+      align-self: flex-end;
+    }
+
+    .chat-bubble.system-msg {
+      background: #374151;
+      color: #d1d5db;
+      align-self: center;
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .chat-input-bar {
+      display: flex;
+      gap: 5px;
+      margin-top: 8px;
+    }
 
     .hidden { display: none !important; }
-    .alert { padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; text-align: center; }
-    .alert-error { background: #7f1d1d; color: #fca5a5; }
-    
-    #loadingOverlay { text-align: center; padding: 20px; font-weight: bold; color: var(--accent); }
   </style>
 </head>
 <body>
 
-<div class="container">
-  
-  <div id="loadingOverlay" class="card">جاري تحميل البيانات والجلسة...</div>
+  <!-- 1. نافذة المصادقة / التسجيل بـ OTP -->
+  <div id="authModal" class="modal-overlay">
+    <div class="modal-card">
+      <h2>🎮 Falcon MC</h2>
+      <p style="color: var(--text-muted); margin-bottom: 20px;" id="authSubtitle">سجل دخولك أو أنشئ حساباً جديداً</p>
 
-  <!-- تسجيل الدخول وإنشاء الحساب -->
-  <div id="authContainer" class="card hidden">
-    <h1 class="brand-title">🎮 Falcon MC</h1>
+      <!-- نموذج طلب OTP -->
+      <form id="otpReqForm" onsubmit="handleSendOtp(event)">
+        <div class="form-group">
+          <label>البريد الإلكتروني:</label>
+          <input type="email" id="authEmail" placeholder="example@gmail.com" required>
+        </div>
+
+        <div id="registerFields">
+          <div class="form-group">
+            <label>اسم اللاعب (IGN):</label>
+            <input type="text" id="authIgn" placeholder="Steve">
+          </div>
+          <div class="form-group">
+            <label>الاسم الحقيقي الثنائي:</label>
+            <input type="text" id="authFullName" placeholder="أحمد علي">
+          </div>
+          <div class="form-group">
+            <label>العمر:</label>
+            <input type="number" id="authAge" placeholder="18">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 15px; text-align: right;">
+          <input type="checkbox" id="isLoginCheck" style="width: auto;" onchange="toggleAuthMode()">
+          <label for="isLoginCheck" style="display: inline; cursor: pointer;">لدي حساب بالفعل (تسجيل دخول)</label>
+        </div>
+
+        <button type="submit" id="sendOtpBtn" class="btn btn-primary">إرسال رمز التحقق 🔑</button>
+      </form>
+
+      <!-- نموذج إدخال رمز OTP -->
+      <form id="otpVerifyForm" class="hidden" onsubmit="handleVerifyOtp(event)">
+        <div class="form-group">
+          <label>رمز التحقق (OTP):</label>
+          <input type="text" id="authOtp" placeholder="أدخل الرمز المكون من 6 أرقام" required>
+        </div>
+        <button type="submit" id="verifyOtpBtn" class="btn btn-success">تأكيد الدخول 🚀</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. الهيدر الرئيسي -->
+  <header>
+    <div class="logo">🎮 Falcon MC</div>
+    <div class="header-actions">
+      <button onclick="fetchDashboardData()" class="btn btn-primary btn-sm">تحديث البيانات 🔄</button>
+      <button onclick="handleLogout()" class="btn btn-danger btn-sm">خروج 🚪</button>
+    </div>
+  </header>
+
+  <!-- 3. المحتوى الرئيسي للوحة -->
+  <div class="container">
     
-    <div class="tabs">
-      <button class="tab-btn active" id="tabSignupBtn" onclick="switchAuthMode('signup')">حساب جديد</button>
-      <button class="tab-btn" id="tabLoginBtn" onclick="switchAuthMode('login')">تسجيل دخول</button>
-    </div>
-
-    <div id="alertMsg" class="alert hidden alert-error"></div>
-
-    <form id="otpReqForm" onsubmit="handleSendOtp(event)">
-      <div id="signupFields">
-        <div class="form-group">
-          <label for="fullName">الاسم الحقيقي الثلاثي (مطلوب)</label>
-          <input type="text" id="fullName" placeholder="مثال: أحمد محمد علي">
-        </div>
-        <div class="form-group">
-          <label for="ign">اسم الحساب في اللعبة (IGN)</label>
-          <input type="text" id="ign" placeholder="مثال: Steve_99">
-        </div>
-        <div class="form-group">
-          <label for="age">السن</label>
-          <input type="number" id="age" placeholder="18">
+    <!-- الجانب الأيمن: البيانات الشخصية والأخبار -->
+    <aside>
+      <!-- ملف اللاعب -->
+      <div class="card">
+        <h3>👤 بيانات الحساب</h3>
+        <div class="profile-info">
+          <div class="profile-item"><span>اسم اللاعب:</span><b id="profIgn">---</b></div>
+          <div class="profile-item"><span>الاسم الحقيقي:</span><b id="profFullName">---</b></div>
+          <div class="profile-item"><span>كود اللاعب:</span><b id="profCode" style="color: var(--accent-blue);">---</b></div>
+          <div class="profile-item"><span>المستوى:</span><b id="profLevel">1</b></div>
+          <div class="profile-item"><span>الوظيفة:</span><b id="profJob" style="color: var(--accent-green);">مواطن</b></div>
         </div>
       </div>
-      
-      <div class="form-group">
-        <label for="email">البريد الإلكتروني</label>
-        <input type="email" id="email" placeholder="name@example.com" required>
-      </div>
 
-      <button type="submit" id="sendOtpBtn" class="btn">إرسال رمز التحقق (OTP)</button>
-    </form>
-
-    <form id="otpVerifyForm" class="hidden" onsubmit="handleVerifyOtp(event)">
-      <div class="form-group">
-        <label for="otpCode">رمز التحقق (OTP)</label>
-        <input type="text" id="otpCode" placeholder="أدخل الـ 6 أرقام" required maxlength="6">
-      </div>
-      <button type="submit" id="verifyOtpBtn" class="btn">تأكيد والدخول</button>
-      <button type="button" class="btn btn-secondary" onclick="resetAuthForm()">تغيير البريد</button>
-    </form>
-  </div>
-
-  <!-- لوحة التحكم -->
-  <div id="dashboardContainer" class="card hidden">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <h2>لوحة الهوية والخدمات</h2>
-      <button class="btn btn-secondary" style="width: auto; padding: 5px 15px;" onclick="logout()">خروج</button>
-    </div>
-
-    <!-- بطاقة الهوية الرقمية -->
-    <div class="id-card">
-      <div class="id-card-header">
-        <span style="font-weight: bold; color: var(--accent);">🪪 بطاقة الهوية الوطنية</span>
-        <span style="font-size: 0.8rem; background: var(--accent); padding: 2px 8px; border-radius: 4px; color: #000; font-weight: bold;">مفعل</span>
-      </div>
-      <div class="id-card-body">
-        <div>
-          <div class="id-field"><span>الاسم الحقيقي:</span><strong id="cardFullName">---</strong></div>
-          <div class="id-field"><span>اسم اللعبة (IGN):</span><strong id="cardIgn">---</strong></div>
-          <div class="id-field"><span>كود اللاعب:</span><strong id="cardPlayerCode" style="color: var(--primary);">---</strong></div>
-        </div>
-        <div style="border-right: 1px solid var(--border); padding-right: 15px;">
-          <div class="id-field"><span>المستوى:</span><strong id="cardLevel" style="color: var(--warning); font-size: 1.4rem;">1</strong></div>
-          <div class="id-field"><span>الوظيفة:</span><strong id="cardJob" style="color: var(--accent);">مواطن</strong></div>
+      <!-- الأخبار والتعميمات -->
+      <div class="card">
+        <h3>📢 الأخبار والتعميمات</h3>
+        <div id="newsList">
+          <p class="text-muted">لا توجد أخبار حالية.</p>
         </div>
       </div>
-    </div>
+    </aside>
 
-    <!-- قفل الديسكورد الإجباري -->
-    <div id="discordGate" class="discord-overlay">
-      <h3 style="color: #5865F2; margin-bottom: 10px;">🔒 يجب الانضمام لسيرفر الديسكورد</h3>
-      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">
-        لرؤية باقي الأخبار والخدمات وبلاغات الشرطة، يجب عليك الانضمام أولاً لسيرفر الديسكورد.
-      </p>
-      <a href="https://discord.gg/YOUR_DISCORD_LINK" target="_blank" class="btn btn-discord" style="display: inline-block; text-decoration: none; width: auto; padding: 10px 25px;" onclick="unlockDiscordData()">
-        الانضمام للديسكورد وتأكيد الحساب
-      </a>
-    </div>
-
-    <!-- القسم المخفي لحين الديسكورد -->
-    <div id="lockedDataSection" class="hidden">
-      
-      <div class="section-box">
-        <h3>📢 آخر الأخبار والإعلانات</h3>
-        <div id="newsList" style="margin-top: 10px;">لا توجد أخبار حالياً.</div>
+    <!-- الجانب الأيسر: القضايا والبلاغات -->
+    <main>
+      <!-- نموذج تقديم قضية للمواطن (غير محدود) -->
+      <div class="card">
+        <h3>🚨 تقديم بلاغ / قضية جديدة</h3>
+        <form onsubmit="handleSendEmergency(event)">
+          <div class="form-group">
+            <label>نوع القضية / البلاغ:</label>
+            <select id="emType" required>
+              <option value="سرقة 💰">سرقة 💰</option>
+              <option value="اعتداء / إطلاق نار 💥">اعتداء / إطلاق نار 💥</option>
+              <option value="حادث سير 🚗">حادث سير 🚗</option>
+              <option value="خطورة عالية ⚠️">خطورة عالية ⚠️</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>الموقع والتفاصيل:</label>
+            <input type="text" id="emLocation" placeholder="أدخل المكان بالتفصيل أو وصف القضية" required>
+          </div>
+          <button type="submit" class="btn btn-danger">إرسال القضية إلى مركز الشرطة 🚓</button>
+        </form>
       </div>
 
-      <div class="section-box">
-        <h3>🚨 طلب طوارئ (شرطة / إسعاف)</h3>
-        <div class="form-group" style="margin-top: 10px;">
-          <input type="text" id="emergencyLocation" placeholder="اكتب موقعك الحالي أو الإحداثيات...">
+      <!-- قائمة القضايا -->
+      <div class="card">
+        <h3>📋 قائمة القضايا المفتوحة والمغلقة</h3>
+        <div id="emergenciesList">
+          <p class="text-muted">جاري تحميل البيانات...</p>
         </div>
-        <div class="emergency-grid">
-          <button class="btn btn-danger" onclick="callEmergency('شرطة 👮‍♂️')">طلب الشرطة</button>
-          <button class="btn btn-warning" onclick="callEmergency('إسعاف 🚑')">طلب الإسعاف</button>
-        </div>
-
-        <h4 style="margin-top: 20px; color: var(--text-muted);">سجل بلاغاتك والمحادثات المباشرة:</h4>
-        <div id="myEmergenciesList" style="margin-top: 10px;">لا توجد بلاغات مسجلة باسمك.</div>
       </div>
-
-      <div id="policePanel" class="section-box hidden" style="border-color: var(--primary);">
-        <h3 style="color: #60a5fa;">👮‍♂️ غرفة عمليات الشرطة (خاص بالضباط)</h3>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">يمكنك كشرطي استلام البلاغ والتواصل المباشر مع المواطن عبر الشات.</p>
-        <div id="policeEmergenciesList">لا توجد بلاغات نشطة من المواطنين.</div>
-      </div>
-
-    </div>
+    </main>
 
   </div>
 
-</div>
+  <!-- JavaScript Code -->
+  <script>
+    // ⚠️ ضع رابط Apps Script الخاص بك هنا
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-dIJJ8rjiwbt-ZFk3qjSYv6UjoUKC6PXydut-lvR6VYUepOj15o9Db7Dr1hIjSMrLFw/exec";
 
-<script>
-  // 🚫 --- 1. حماية ومنع فتح الكونسول وقائمة الكليك الأيمن ---
-  document.addEventListener('contextmenu', e => e.preventDefault());
+    let state = {
+      email: localStorage.getItem("falcon_email") || "",
+      userData: null
+    };
 
-  document.addEventListener('keydown', function(e) {
-    if (e.keyCode === 123 || e.key === "F12") {
+    window.onload = () => {
+      if (state.email) {
+        document.getElementById("authModal").classList.add("hidden");
+        fetchDashboardData();
+      }
+    };
+
+    function toggleAuthMode() {
+      const isLogin = document.getElementById("isLoginCheck").checked;
+      document.getElementById("registerFields").classList.toggle("hidden", isLogin);
+    }
+
+    // --- 1. عمليات المصادقة ---
+    async function handleSendOtp(e) {
       e.preventDefault();
-      return false;
+      const email = document.getElementById("authEmail").value.trim();
+      const ign = document.getElementById("authIgn").value.trim();
+      const fullName = document.getElementById("authFullName").value.trim();
+      const age = document.getElementById("authAge").value.trim();
+      const isLogin = document.getElementById("isLoginCheck").checked;
+
+      const btn = document.getElementById("sendOtpBtn");
+      btn.innerText = "جاري الإرسال...";
+      btn.disabled = true;
+
+      try {
+        const res = await apiCall({
+          action: "sendOtp",
+          email: email,
+          ign: ign,
+          fullName: fullName,
+          age: age,
+          isLogin: isLogin
+        });
+
+        if (res.status === "success") {
+          state.email = email;
+          document.getElementById("otpReqForm").classList.add("hidden");
+          document.getElementById("otpVerifyForm").classList.remove("hidden");
+          document.getElementById("authSubtitle").innerText = "أدخل رمز OTP المرسل إلى بريدك الإلكتروني";
+        } else {
+          alert("خطأ: " + res.message);
+        }
+      } catch (err) {
+        alert("فشل الاتصال بالسيرفر!");
+      } finally {
+        btn.innerText = "إرسال رمز التحقق 🔑";
+        btn.disabled = false;
+      }
     }
-    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
+
+    async function handleVerifyOtp(e) {
       e.preventDefault();
-      return false;
+      const otp = document.getElementById("authOtp").value.trim();
+      const btn = document.getElementById("verifyOtpBtn");
+      btn.innerText = "جاري التحقق...";
+      btn.disabled = true;
+
+      try {
+        const res = await apiCall({
+          action: "verifyOtp",
+          email: state.email,
+          otp: otp
+        });
+
+        if (res.status === "success") {
+          localStorage.setItem("falcon_email", state.email);
+          document.getElementById("authModal").classList.add("hidden");
+          renderDashboard(res);
+        } else {
+          alert("خطأ: " + res.message);
+        }
+      } catch (err) {
+        alert("فشل التحقق من الرمز!");
+      } finally {
+        btn.innerText = "تأكيد الدخول 🚀";
+        btn.disabled = false;
+      }
     }
-    if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
-      e.preventDefault();
-      return false;
-    }
-  });
 
-
-  // ⚙️ --- 2. إعدادات النظام والجلسة المستمرة ---
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-dIJJ8rjiwbt-ZFk3qjSYv6UjoUKC6PXydut-lvR6VYUepOj15o9Db7Dr1hIjSMrLFw/exec";
-
-  let isLoginMode = false;
-  let currentEmail = "";
-  let userProfile = {};
-
-  window.addEventListener('DOMContentLoaded', checkSavedSession);
-
-  async function checkSavedSession() {
-    const saved = localStorage.getItem("falcon_user_data");
-    if (!saved) {
-      showAuthScreen();
-      return;
+    // --- 2. جلب وتحديث بيانات اللوحة ---
+    async function fetchDashboardData() {
+      if (!state.email) return;
+      try {
+        const res = await apiCall({
+          action: "getDashboardData",
+          email: state.email
+        });
+        if (res.status === "success") {
+          renderDashboard(res);
+        } else {
+          handleLogout();
+        }
+      } catch (err) {
+        console.error("فشل تحديث البيانات:", err);
+      }
     }
 
-    try {
-      const parsed = JSON.parse(saved);
-      if (!parsed.email) {
-        showAuthScreen();
+    function renderDashboard(data) {
+      state.userData = data;
+
+      // تحديث ملف اللاعب
+      document.getElementById("profIgn").innerText = data.ign;
+      document.getElementById("profFullName").innerText = data.fullName;
+      document.getElementById("profCode").innerText = data.playerCode;
+      document.getElementById("profLevel").innerText = data.level;
+      document.getElementById("profJob").innerText = data.job;
+
+      // عرض الأخبار
+      const newsContainer = document.getElementById("newsList");
+      newsContainer.innerHTML = "";
+      if (data.news && data.news.length > 0) {
+        data.news.forEach(item => {
+          newsContainer.innerHTML += `
+            <div class="news-item">
+              <div><b>${item.title}</b> <span class="news-badge">${item.badge}</span></div>
+              <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">${item.content}</p>
+              <small style="font-size: 10px; color: #6b7280;">${item.date}</small>
+            </div>
+          `;
+        });
+      } else {
+        newsContainer.innerHTML = `<p class="text-muted">لا توجد أخبار جديدة.</p>`;
+      }
+
+      // عرض القضايا
+      const list = data.isPolice ? data.allEmergenciesForPolice : data.myEmergencies;
+      renderEmergencies(list, data.isPolice);
+    }
+
+    // --- 3. عرض القضايا والتحكم الخاص بالشرطة والمواطن ---
+    function renderEmergencies(list, isPolice) {
+      const container = document.getElementById("emergenciesList");
+      container.innerHTML = "";
+
+      if (!list || list.length === 0) {
+        container.innerHTML = "<p class='text-muted'>لا توجد قضايا مسجلة حالياً.</p>";
         return;
       }
 
-      currentEmail = parsed.email;
+      list.forEach(item => {
+        const isClosed = item.status.includes("مغلقة");
+        const isWorking = item.status.includes("المباشرة");
 
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({
-          action: "getDashboardData",
-          email: currentEmail
-        })
-      });
-
-      const data = await res.json();
-      if (data.status === "success") {
-        userProfile = data;
-        loadDashboard(data);
-      } else {
-        localStorage.removeItem("falcon_user_data");
-        showAuthScreen();
-      }
-    } catch (e) {
-      showAuthScreen();
-    }
-  }
-
-  function showAuthScreen() {
-    document.getElementById("loadingOverlay").classList.add("hidden");
-    document.getElementById("authContainer").classList.remove("hidden");
-  }
-
-  function showAlert(msg) {
-    const el = document.getElementById("alertMsg");
-    el.innerText = msg;
-    el.classList.remove("hidden");
-  }
-
-  function hideAlert() {
-    document.getElementById("alertMsg").classList.add("hidden");
-  }
-
-  function switchAuthMode(mode) {
-    hideAlert();
-    isLoginMode = (mode === 'login');
-    document.getElementById("tabSignupBtn").className = `tab-btn ${!isLoginMode ? 'active' : ''}`;
-    document.getElementById("tabLoginBtn").className = `tab-btn ${isLoginMode ? 'active' : ''}`;
-    document.getElementById("signupFields").classList.toggle("hidden", isLoginMode);
-  }
-
-  async function handleSendOtp(e) {
-    e.preventDefault();
-    hideAlert();
-    
-    currentEmail = document.getElementById("email").value.trim();
-    const fullName = document.getElementById("fullName").value.trim();
-    const ign = document.getElementById("ign").value.trim();
-
-    if (!isLoginMode && fullName.split(" ").filter(Boolean).length < 2) {
-      return showAlert("يرجى كتابة اسمك الحقيقي الثنائي على الأقل.");
-    }
-
-    const btn = document.getElementById("sendOtpBtn");
-    btn.disabled = true;
-    btn.innerText = "جاري الإرسال...";
-
-    try {
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({
-          action: "sendOtp",
-          email: currentEmail,
-          fullName: fullName,
-          ign: ign,
-          age: document.getElementById("age").value.trim(),
-          isLogin: isLoginMode
-        })
-      });
-
-      const data = await res.json();
-      btn.disabled = false;
-      btn.innerText = "إرسال رمز التحقق (OTP)";
-
-      if (data.status === "success") {
-        document.getElementById("otpReqForm").classList.add("hidden");
-        document.getElementById("otpVerifyForm").classList.remove("hidden");
-      } else {
-        showAlert(data.message || "حدث خطأ أثناء الإرسال");
-      }
-    } catch (err) {
-      btn.disabled = false;
-      btn.innerText = "إرسال رمز التحقق (OTP)";
-      showAlert("فشل الاتصال بالسيرفر.");
-    }
-  }
-
-  async function handleVerifyOtp(e) {
-    e.preventDefault();
-    hideAlert();
-
-    const otp = document.getElementById("otpCode").value.trim();
-    const btn = document.getElementById("verifyOtpBtn");
-    btn.disabled = true;
-
-    try {
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({ action: "verifyOtp", email: currentEmail, otp: otp })
-      });
-
-      const data = await res.json();
-      btn.disabled = false;
-
-      if (data.status === "success") {
-        userProfile = data;
-        localStorage.setItem("falcon_user_data", JSON.stringify({ email: currentEmail }));
-        loadDashboard(data);
-      } else {
-        showAlert(data.message || "رمز التحقق غير صحيح");
-      }
-    } catch (err) {
-      btn.disabled = false;
-      showAlert("حدث خطأ أثناء التحقق.");
-    }
-  }
-
-  function loadDashboard(data) {
-    document.getElementById("loadingOverlay").classList.add("hidden");
-    document.getElementById("authContainer").classList.add("hidden");
-    document.getElementById("dashboardContainer").classList.remove("hidden");
-
-    document.getElementById("cardFullName").innerText = data.fullName || "غير مسجل";
-    document.getElementById("cardIgn").innerText = data.ign || "---";
-    document.getElementById("cardPlayerCode").innerText = data.playerCode || "---";
-    document.getElementById("cardLevel").innerText = data.level || "1";
-    document.getElementById("cardJob").innerText = data.job || "مواطن";
-
-    const newsBox = document.getElementById("newsList");
-    if (data.news && data.news.length > 0) {
-      newsBox.innerHTML = data.news.map(item => `
-        <div class="list-item">
-          <span class="badge">${item.badge}</span>
-          <strong style="display:block; margin: 2px 0;">${item.title}</strong>
-          <p style="font-size:0.9rem; color:var(--text-muted);">${item.content}</p>
-          <small style="color:#64748b; display:block; margin-top:5px;">${item.date}</small>
-        </div>
-      `).join("");
-    } else {
-      newsBox.innerHTML = "<p style='color:var(--text-muted);'>لا توجد أخبار جديدة.</p>";
-    }
-
-    renderMyEmergencies(data.myEmergencies || []);
-
-    if (data.isPolice) {
-      document.getElementById("policePanel").classList.remove("hidden");
-      renderPolicePanel(data.allEmergenciesForPolice || []);
-    }
-
-    if (localStorage.getItem("discord_verified") === "true") {
-      document.getElementById("discordGate").classList.add("hidden");
-      document.getElementById("lockedDataSection").classList.remove("hidden");
-    }
-  }
-
-  // --- 💬 عرض البلاغات والشات للمواطن ---
-  function renderMyEmergencies(list) {
-    const container = document.getElementById("myEmergenciesList");
-    if (!list || list.length === 0) {
-      container.innerHTML = "<p style='color:var(--text-muted); font-size: 0.85rem;'>لا توجد بلاغات سابقة.</p>";
-      return;
-    }
-
-    container.innerHTML = list.map(item => {
-      const messages = item.chatMessages || [];
-      return `
-        <div class="list-item">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <strong>نوع البلاغ: ${item.type}</strong>
-            <span style="color:var(--warning); font-size:0.85rem;">${item.status}</span>
-          </div>
-          <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">الموقع: ${item.location}</p>
-          
-          ${item.officerName && item.officerName !== '---' ? `
-            <div class="chat-box">
-              <div class="chat-messages" id="chat_box_${item.rowId}">
-                ${messages.map(msg => renderChatMessage(msg, false)).join("")}
-              </div>
-              <div class="chat-input-container">
-                <input type="text" id="chat_input_${item.rowId}" placeholder="اكتب رسالة للشرطي..." onkeydown="if(event.key==='Enter') sendChatMessage(${item.rowId}, false)">
-                <button class="btn btn-police" onclick="sendChatMessage(${item.rowId}, false)">إرسال</button>
-              </div>
+        // أزرار التحكم للشرطة
+        let policeActions = "";
+        if (isPolice) {
+          policeActions = `
+            <div class="controls-group">
+              ${!isWorking && !isClosed ? `
+                <button onclick="handlePoliceAction('acceptEmergency', ${item.rowId})" class="btn btn-success btn-sm">مباشرة القضية 🚔</button>
+              ` : ''}
+              
+              ${!isClosed ? `
+                <button onclick="handlePoliceAction('closeEmergency', ${item.rowId})" class="btn btn-danger btn-sm">إلغاء / إغلاق القضية 🔒</button>
+              ` : `
+                <button onclick="handlePoliceAction('reopenEmergency', ${item.rowId})" class="btn btn-warning btn-sm">إعادة فتح القضية 🔓</button>
+              `}
             </div>
-          ` : `<p style="font-size:0.8rem; color:var(--text-muted); margin-top:8px;">⏳ بانتظار استلام البلاغ من أحد الضباط...</p>`}
-        </div>
-      `;
-    }).join("");
-  }
+          `;
+        }
 
-  // --- 💬 عرض البلاغات والشات للشرطي ---
-  function renderPolicePanel(list) {
-    const container = document.getElementById("policeEmergenciesList");
-    if (!list || list.length === 0) {
-      container.innerHTML = "<p style='color:var(--text-muted);'>لا توجد بلاغات مقدمة حالياً.</p>";
-      return;
-    }
-
-    container.innerHTML = list.map(item => {
-      const isAccepted = item.status.includes("مباشرة") || item.status.includes("استجابة");
-      const messages = item.chatMessages || [];
-
-      return `
-        <div class="list-item police-item">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <strong>بلاغ من: ${item.fullName} (${item.playerCode})</strong>
-            <span style="background:#1e3a8a; color:#93c5fd; padding:2px 8px; border-radius:4px; font-size:0.75rem;">${item.type}</span>
+        // محادثات القضية
+        let chatContent = (item.chatMessages || []).map(msg => `
+          <div class="chat-bubble ${msg.isPolice ? 'police-msg' : (msg.senderName === 'النظام' ? 'system-msg' : 'user-msg')}">
+            <b>${msg.senderName}:</b> ${msg.text}
           </div>
-          <p style="font-size:0.85rem; margin-top:5px;"><b>الموقع:</b> ${item.location}</p>
-          <p style="font-size:0.85rem; color:var(--text-muted);"><b>التاريخ:</b> ${item.date} | <b>الحالة:</b> ${item.status}</p>
+        `).join("");
 
-          ${!isAccepted ? `
-            <button class="btn btn-police" style="margin-top:10px;" onclick="acceptEmergencyCall(${item.rowId})">
-              👮‍♂️ استلام البلاغ وإشعار المواطن
-            </button>
-          ` : `
-            <div class="chat-box">
-              <div class="chat-messages" id="police_chat_box_${item.rowId}">
-                ${messages.map(msg => renderChatMessage(msg, true)).join("")}
-              </div>
-              <div class="chat-input-container">
-                <input type="text" id="police_chat_input_${item.rowId}" placeholder="اكتب للـ مواطن..." onkeydown="if(event.key==='Enter') sendChatMessage(${item.rowId}, true)">
-                <button class="btn btn-police" onclick="sendChatMessage(${item.rowId}, true)">إرسال</button>
-              </div>
+        const card = document.createElement("div");
+        card.className = `emergency-card ${isClosed ? 'status-closed' : (isWorking ? 'status-active' : '')}`;
+        card.innerHTML = `
+          <div class="card-top">
+            <h4 style="color: var(--accent-blue);">قضية #${item.rowId} - ${item.type}</h4>
+            <span class="badge">${item.status}</span>
+          </div>
+          <p style="font-size: 14px;"><b>صاحب البلاغ:</b> ${item.fullName} (${item.playerCode})</p>
+          <p style="font-size: 14px;"><b>الموقع / التفاصيل:</b> ${item.location}</p>
+          <p style="font-size: 13px; color: var(--text-muted);"><b>الضابط المباشر:</b> ${item.officerName}</p>
+          <small style="font-size: 11px; color: #6b7280;">التاريخ: ${item.date}</small>
+
+          ${policeActions}
+
+          <!-- محادثة القضية -->
+          <div class="chat-container">
+            <h5 style="font-size: 13px; margin-bottom: 5px;">💬 المحادثة المباشرة:</h5>
+            <div class="chat-messages" id="chatBox-${item.rowId}">
+              ${chatContent || '<p class="text-muted" style="font-size: 12px;">لا توجد رسائل بعد.</p>'}
             </div>
-          `}
-        </div>
-      `;
-    }).join("");
-  }
+            
+            ${!isClosed ? `
+              <div class="chat-input-bar">
+                <input type="text" id="chatInput-${item.rowId}" placeholder="اكتب رسالتك..." onkeypress="if(event.key==='Enter') sendChatMessage(${item.rowId})">
+                <button onclick="sendChatMessage(${item.rowId})" class="btn btn-primary btn-sm">إرسال</button>
+              </div>
+            ` : '<p style="font-size: 11px; color: var(--accent-red); margin-top: 5px;"><i>هذه القضية مغلقة ولا يمكن إرسال رسائل بها.</i></p>'}
+          </div>
+        `;
 
-  // بناء فقرة الرسالة داخل الشات
-  function renderChatMessage(msg, viewerIsPolice) {
-    if (msg.type === "system") {
-      return `<div class="chat-msg chat-msg-system">🔔 ${msg.text}</div>`;
+        container.appendChild(card);
+      });
     }
 
-    const isMine = (viewerIsPolice && msg.isPolice) || (!viewerIsPolice && !msg.isPolice);
-    const cssClass = msg.isPolice ? "chat-msg-police" : "chat-msg-citizen";
+    // --- 4. إرسال بلاغ جديد (للمواطن) ---
+    async function handleSendEmergency(e) {
+      e.preventDefault();
+      const type = document.getElementById("emType").value;
+      const location = document.getElementById("emLocation").value.trim();
 
-    return `
-      <div class="chat-msg ${cssClass}" style="${isMine ? 'border:1px solid #ffffff44;' : ''}">
-        <span class="chat-sender-name">${msg.senderName}</span>
-        <div>${msg.text}</div>
-      </div>
-    `;
-  }
-
-  // --- 🚨 استلام البلاغ تلقائياً من الشرطي ---
-  async function acceptEmergencyCall(rowId) {
-    const officerName = userProfile.fullName + " (" + userProfile.ign + ")";
-    
-    try {
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({
-          action: "acceptEmergency",
-          rowId: rowId,
-          officerName: officerName
-        })
+      const res = await apiCall({
+        action: "sendEmergency",
+        playerCode: state.userData.playerCode,
+        fullName: state.userData.fullName,
+        type: type,
+        location: location
       });
 
-      const data = await res.json();
-      alert("تم استلام البلاغ وإشعار المواطن تلقائياً!");
-      location.reload();
-    } catch (e) {
-      alert("حدث خطأ أثناء استلام البلاغ.");
+      if (res.status === "success") {
+        alert(res.message);
+        document.getElementById("emLocation").value = "";
+        fetchDashboardData();
+      }
     }
-  }
 
-  // --- 💬 إرسال رسالة شات جديدة ---
-  async function sendChatMessage(rowId, isPolice) {
-    const inputId = isPolice ? `police_chat_input_${rowId}` : `chat_input_${rowId}`;
-    const inputEl = document.getElementById(inputId);
-    const text = inputEl.value.trim();
+    // --- 5. أوامر الشرطة (مباشرة / إغلاق / إعادة فتح) ---
+    async function handlePoliceAction(actionType, rowId) {
+      if (actionType === 'closeEmergency' && !confirm("هل تريد تأكيد إلغاء وإغلاق هذه القضية؟")) return;
 
-    if (!text) return;
-
-    const senderName = isPolice ? `الضابط ${userProfile.fullName}` : userProfile.fullName;
-
-    inputEl.value = "جاري الإرسال...";
-    inputEl.disabled = true;
-
-    try {
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({
-          action: "sendChatMessage",
-          rowId: rowId,
-          text: text,
-          senderName: senderName,
-          isPolice: isPolice
-        })
+      const res = await apiCall({
+        action: actionType,
+        rowId: rowId,
+        officerName: state.userData.fullName
       });
 
-      const data = await res.json();
-      inputEl.value = "";
-      inputEl.disabled = false;
-      location.reload();
-    } catch (e) {
-      inputEl.disabled = false;
-      inputEl.value = text;
-      alert("فشل إرسال الرسالة.");
+      if (res.status === "success") {
+        fetchDashboardData();
+      }
     }
-  }
 
-  async function callEmergency(type) {
-    const location = document.getElementById("emergencyLocation").value.trim();
-    if (!location) return alert("يرجى كتابة الموقع لإرسال البلاغ!");
+    // --- 6. إرسال رسالة في الشات ---
+    async function sendChatMessage(rowId) {
+      const input = document.getElementById(`chatInput-${rowId}`);
+      const text = input.value.trim();
+      if (!text) return;
 
-    try {
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({
-          action: "sendEmergency",
-          playerCode: userProfile.playerCode,
-          fullName: userProfile.fullName,
-          type: type,
-          location: location
-        })
+      const res = await apiCall({
+        action: "sendChatMessage",
+        rowId: rowId,
+        senderName: state.userData.fullName,
+        text: text,
+        isPolice: state.userData.isPolice
       });
-      const data = await res.json();
-      alert(data.message || "تم إرسال البلاغ!");
-      document.getElementById("emergencyLocation").value = "";
-      location.reload();
-    } catch (e) {
-      alert("فشل الإرسال.");
+
+      if (res.status === "success") {
+        input.value = "";
+        fetchDashboardData();
+      }
     }
-  }
 
-  function unlockDiscordData() {
-    localStorage.setItem("discord_verified", "true");
-    setTimeout(() => {
-      document.getElementById("discordGate").classList.add("hidden");
-      document.getElementById("lockedDataSection").classList.remove("hidden");
-    }, 1200);
-  }
+    // --- 7. دالة المساعدة للاتصال بـ Apps Script ---
+    async function apiCall(data) {
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
 
-  function resetAuthForm() {
-    document.getElementById("otpReqForm").classList.remove("hidden");
-    document.getElementById("otpVerifyForm").classList.add("hidden");
-    hideAlert();
-  }
-
-  function logout() {
-    localStorage.removeItem("falcon_user_data");
-    localStorage.removeItem("discord_verified");
-    location.reload();
-  }
-</script>
+    function handleLogout() {
+      localStorage.removeItem("falcon_email");
+      location.reload();
+    }
+  </script>
 </body>
 </html>
