@@ -1201,5 +1201,38 @@
       location.reload();
     }
   </script>
+  <script>
+  // منع زر F12 واختصارات أدوات المطور (DevTools)
+  document.addEventListener('keydown', function(e) {
+    // 1. منع F12
+    if (e.key === 'F12' || e.keyCode === 123) {
+      e.preventDefault();
+      return false;
+    }
+
+    // 2. منع Ctrl + Shift + I (Inspect Element)
+    // 3. منع Ctrl + Shift + J (Console)
+    // 4. منع Ctrl + Shift + C (Element Selector)
+    if (e.ctrlKey && e.shiftKey && (
+      e.key === 'I' || e.key === 'i' || 
+      e.key === 'J' || e.key === 'j' || 
+      e.key === 'C' || e.key === 'c'
+    )) {
+      e.preventDefault();
+      return false;
+    }
+
+    // 5. منع Ctrl + U (عرض سورس الكود View Source)
+    if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) {
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  // 6. منع القائمة المنسدلة عند الضغط بزر الماوس الأيمن (Right Click)
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  });
+</script>
 </body>
 </html>
