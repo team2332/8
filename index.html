@@ -4,47 +4,120 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- 🔍 إعدادات محركات البحث SEO -->
-  <title>Falcon Server - سيرفر فالكون ماينكرافت</title>
-  <meta name="description" content="الموقع الرسمي لسيرفر Falcon. تابع الأخبار، قدم الشكاوى والبلاغات، وتواصل مع اللاعبين والشرطة مباشرة.">
-  <meta name="keywords" content="Falcon, Falcon Server, سيرفر فالكون, ماينكرافت, Minecraft Server">
+  <!-- 🔍 SEO Metatags -->
+  <title>Falcon Roleplay - Portal</title>
+  <meta name="description" content="البوابة الرسمية لسيرفر Falcon Roleplay - متابعة البلاغات والقضايا والأخبار لحظة بلحظة.">
+  <meta name="keywords" content="Falcon, Minecraft, Roleplay, فالكون, سيرفر فالكون">
   <meta name="robots" content="index, follow">
-  
-  <!-- 🏷️ ضع كود إثبات ملكية جوجل هنا عند استلامه (Meta Tag) -->
-  <!-- <meta name="google-site-verification" content="كود-التفعيل-هنا" /> -->
 
   <style>
     :root {
-      --bg-dark: #0f172a;
-      --card-bg: #1e293b;
-      --accent-blue: #38bdf8;
-      --accent-green: #22c55e;
-      --accent-red: #ef4444;
-      --accent-gold: #f59e0b;
-      --text-light: #f8fafc;
-      --text-muted: #94a3b8;
-      --border-color: #334155;
+      --bg-main: #0c0214;
+      --bg-card: rgba(22, 8, 38, 0.75);
+      --bg-card-hover: rgba(35, 12, 60, 0.85);
+      --border-color: rgba(230, 0, 122, 0.25);
+      --border-cyan: rgba(0, 166, 255, 0.3);
+      
+      --neon-pink: #e6007a;
+      --neon-cyan: #00a6ff;
+      --neon-purple: #9d00ff;
+      --neon-green: #00ff88;
+      --neon-red: #ff2a6d;
+      
+      --text-main: #f8fafc;
+      --text-muted: #a1a1aa;
+      
+      --glow-pink: 0 0 20px rgba(230, 0, 122, 0.4);
+      --glow-cyan: 0 0 20px rgba(0, 166, 255, 0.4);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
     body {
-      background-color: var(--bg-dark);
-      color: var(--text-light);
-      padding-bottom: 40px;
-      user-select: none; /* منع تحديد النصوص */
+      background: var(--bg-main);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(230, 0, 122, 0.15) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(0, 166, 255, 0.15) 0%, transparent 45%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      min-height: 100vh;
+      user-select: none;
+      overflow-x: hidden;
     }
 
-    /* --- Navbar --- */
+    /* --- Page View Controller --- */
+    .page-view {
+      min-height: 100vh;
+      width: 100%;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .hidden {
+      display: none !important;
+    }
+
+    /* --- FULL PAGE 1: AUTH PAGE --- */
+    #authPage {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .auth-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--glow-pink);
+      border-radius: 20px;
+      padding: 40px 30px;
+      width: 100%;
+      max-width: 440px;
+      text-align: center;
+      position: relative;
+    }
+
+    .auth-logo-wrapper {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--neon-pink), var(--neon-cyan));
+      padding: 3px;
+      box-shadow: var(--glow-cyan);
+    }
+
+    .auth-logo-inner {
+      width: 100%;
+      height: 100%;
+      background: var(--bg-main);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+    }
+
+    .auth-title {
+      font-size: 26px;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 5px;
+    }
+
+    /* --- FULL PAGE 2: DASHBOARD PAGE --- */
     header {
-      background-color: var(--card-bg);
+      background: rgba(12, 2, 20, 0.85);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border-color);
-      padding: 15px 20px;
+      padding: 15px 30px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -53,354 +126,387 @@
       z-index: 100;
     }
 
-    .logo {
-      font-size: 20px;
-      font-weight: bold;
-      color: var(--accent-blue);
+    .brand-logo {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
-    .header-actions {
+    .nav-actions {
       position: relative;
     }
 
     .dropdown-menu {
       position: absolute;
       left: 0;
-      top: 40px;
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
+      top: 45px;
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-cyan);
+      box-shadow: var(--glow-cyan);
+      border-radius: 12px;
       display: none;
       flex-direction: column;
-      width: 160px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      width: 180px;
+      overflow: hidden;
       z-index: 101;
     }
 
-    .dropdown-menu.show {
-      display: flex;
-    }
+    .dropdown-menu.show { display: flex; }
 
     .dropdown-item {
-      padding: 10px 15px;
-      color: var(--text-light);
-      text-decoration: none;
+      padding: 12px 16px;
+      color: var(--text-main);
       background: none;
       border: none;
       text-align: right;
       cursor: pointer;
-      width: 100%;
+      font-size: 14px;
+      font-weight: 600;
+      transition: 0.2s;
     }
 
     .dropdown-item:hover {
-      background-color: var(--border-color);
+      background: rgba(0, 166, 255, 0.15);
+      color: var(--neon-cyan);
     }
 
-    /* --- Container & Layout --- */
     .container {
-      max-width: 1000px;
-      margin: 20px auto;
-      padding: 0 15px;
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
       display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 20px;
+      grid-template-columns: 320px 1fr;
+      gap: 25px;
     }
 
-    @media (max-width: 768px) {
-      .container {
-        grid-template-columns: 1fr;
-      }
+    @media (max-width: 900px) {
+      .container { grid-template-columns: 1fr; }
     }
 
+    /* --- Cards & UI Elements --- */
     .card {
-      background-color: var(--card-bg);
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
       border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 25px;
+      transition: border-color 0.3s;
     }
 
-    .card-title {
-      font-size: 16px;
-      font-weight: bold;
-      color: var(--accent-blue);
-      margin-bottom: 15px;
+    .card:hover {
+      border-color: rgba(0, 166, 255, 0.4);
+    }
+
+    .card-header {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--neon-cyan);
       border-bottom: 1px solid var(--border-color);
-      padding-bottom: 8px;
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    /* --- Forms & Controls --- */
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    label {
-      display: block;
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 5px;
-    }
-
+    /* --- Form Elements --- */
+    .form-group { margin-bottom: 18px; text-align: right; }
+    label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
+    
     input, select, textarea {
       width: 100%;
-      padding: 10px;
-      background: #0f172a;
+      padding: 12px 14px;
+      background: rgba(12, 2, 20, 0.6);
       border: 1px solid var(--border-color);
-      border-radius: 6px;
+      border-radius: 10px;
       color: #fff;
       font-size: 14px;
       outline: none;
+      transition: all 0.3s;
     }
 
     input:focus, select:focus, textarea:focus {
-      border-color: var(--accent-blue);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 10px rgba(0, 166, 255, 0.3);
     }
 
+    /* --- Buttons --- */
     .btn {
-      padding: 10px 16px;
+      padding: 12px 20px;
       border: none;
-      border-radius: 6px;
-      font-weight: bold;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
       cursor: pointer;
-      transition: opacity 0.2s;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
-    .btn:hover { opacity: 0.9; }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-primary { background-color: var(--accent-blue); color: #000; }
-    .btn-success { background-color: var(--accent-green); color: #000; }
-    .btn-danger { background-color: var(--accent-red); color: #fff; }
-    .btn-warning { background-color: var(--accent-gold); color: #000; }
-    .btn-sm { padding: 6px 10px; font-size: 12px; }
+    .btn-pink {
+      background: linear-gradient(135deg, var(--neon-pink), #a00055);
+      color: #fff;
+      box-shadow: var(--glow-pink);
+    }
+
+    .btn-cyan {
+      background: linear-gradient(135deg, var(--neon-cyan), #0066b3);
+      color: #fff;
+      box-shadow: var(--glow-cyan);
+    }
+
+    .btn-green { background: var(--neon-green); color: #000; }
+    .btn-red { background: var(--neon-red); color: #fff; }
+    .btn-sm { padding: 7px 12px; font-size: 12px; border-radius: 8px; }
+
+    .btn:hover { transform: translateY(-2px); opacity: 0.95; }
+    .btn:disabled { opacity: 0.5; transform: none; cursor: not-allowed; }
+
+    /* --- User Profile Card --- */
+    .profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 15px;
+    }
+    .avatar {
+      width: 55px; height: 55px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--neon-pink), var(--neon-cyan));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; font-weight: bold;
+    }
 
     /* --- News Section --- */
-    .news-item {
-      padding: 10px;
-      border-bottom: 1px solid var(--border-color);
+    .news-card {
+      background: rgba(12, 2, 20, 0.5);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
     }
-    .news-item:last-child { border-bottom: none; }
-    .news-badge {
-      background: var(--accent-blue);
-      color: #000;
+    .news-tag {
+      background: var(--neon-pink);
+      color: #fff;
       font-size: 10px;
       padding: 2px 6px;
       border-radius: 4px;
+      font-weight: bold;
     }
 
-    /* --- Emergency Cards & Chat --- */
-    .emergency-card {
-      background: #0f172a;
+    /* --- Emergency & Chat Cards --- */
+    .emergency-item {
+      background: rgba(12, 2, 20, 0.6);
       border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 15px;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 18px;
     }
-    .emergency-card.status-active { border-right: 4px solid var(--accent-gold); }
-    .emergency-card.status-closed { border-right: 4px solid var(--accent-red); opacity: 0.8; }
+    .emergency-item.active { border-right: 4px solid var(--neon-cyan); }
+    .emergency-item.closed { border-right: 4px solid var(--neon-red); opacity: 0.75; }
 
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
+    .chat-box {
+      background: rgba(18, 4, 30, 0.8);
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 12px;
     }
-
-    .chat-container {
-      margin-top: 15px;
-      background: #1e293b;
-      border-radius: 6px;
-      padding: 10px;
-    }
-
-    .chat-messages {
-      max-height: 150px;
+    .chat-logs {
+      max-height: 160px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 8px;
       margin-bottom: 10px;
-      padding-right: 5px;
     }
-
-    .chat-bubble {
-      padding: 6px 10px;
-      border-radius: 6px;
+    .msg-bubble {
+      padding: 8px 12px;
+      border-radius: 8px;
       font-size: 12px;
       max-width: 85%;
     }
-    .chat-bubble.user-msg { background: #334155; align-self: flex-start; }
-    .chat-bubble.police-msg { background: #1e3a8a; border: 1px solid var(--accent-blue); align-self: flex-end; }
-    .chat-bubble.system-msg { background: #374151; color: var(--accent-gold); text-align: center; width: 100%; }
+    .msg-user { background: rgba(0, 166, 255, 0.15); border: 1px solid var(--border-cyan); align-self: flex-start; }
+    .msg-police { background: rgba(230, 0, 122, 0.2); border: 1px solid var(--border-color); align-self: flex-end; }
+    .msg-system { background: rgba(255,255,255,0.05); color: var(--neon-cyan); text-align: center; width: 100%; }
 
-    .chat-input-bar {
-      display: flex;
-      gap: 5px;
-    }
-
-    /* --- Modals --- */
+    /* --- Modal Overlay --- */
     .modal-overlay {
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.8);
+      inset: 0;
+      background: rgba(12, 2, 20, 0.85);
+      backdrop-filter: blur(8px);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 1000;
     }
-    .modal-body {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 25px;
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border-cyan);
+      box-shadow: var(--glow-cyan);
+      border-radius: 18px;
+      padding: 30px;
       width: 90%;
-      max-width: 400px;
+      max-width: 450px;
     }
-    .hidden { display: none !important; }
-    .text-muted { color: var(--text-muted); font-size: 13px; }
   </style>
 </head>
 <body>
 
-  <!-- 🛑 نافذة تسجيل الدخول بـ OTP -->
-  <div id="authModal" class="modal-overlay">
-    <div class="modal-body">
-      <h3 style="margin-bottom: 10px; color: var(--accent-blue);">Falcon Portal 🦅</h3>
-      <p id="authSubtitle" class="text-muted" style="margin-bottom: 15px;">تسجيل الدخول / إنشاء حساب عبر رمز التحقق</p>
-      
+  <!-- ================= 🚪 FULL PAGE 1: AUTH PAGE ================= -->
+  <div id="authPage" class="page-view">
+    <div class="auth-card">
+      <div class="auth-logo-wrapper">
+        <div class="auth-logo-inner">🦅</div>
+      </div>
+      <h2 class="auth-title">FALCON PORTAL</h2>
+      <p id="authSubtitle" style="font-size: 13px; color: var(--text-muted); margin-bottom: 25px;">بوابة الدخول الموحدة لاعبي فالكون</p>
+
       <form id="otpReqForm" onsubmit="handleSendOtp(event)">
         <div class="form-group">
           <label>البريد الإلكتروني</label>
-          <input type="email" id="authEmail" required placeholder="name@domain.com">
+          <input type="email" id="authEmail" required placeholder="example@falcon.com">
         </div>
         <div id="registerFields">
           <div class="form-group">
             <label>اسم اللاعب (IGN)</label>
-            <input type="text" id="authIgn" placeholder="مثال: Falcon_99">
+            <input type="text" id="authIgn" placeholder="Falcon_Player">
           </div>
           <div class="form-group">
-            <label>الاسم الكامل</label>
-            <input type="text" id="authFullName" placeholder="اسمك الحقيقي">
+            <label>الاسم الثلاثي</label>
+            <input type="text" id="authFullName" placeholder="الاسم الحقيقي">
           </div>
           <div class="form-group">
             <label>العمر</label>
-            <input type="number" id="authAge" placeholder="15">
+            <input type="number" id="authAge" placeholder="18">
           </div>
         </div>
-        <div style="margin-bottom: 15px;">
+        <div style="margin-bottom: 20px; text-align: right;">
           <input type="checkbox" id="isLoginCheck" style="width: auto;" onchange="toggleAuthMode()">
-          <label for="isLoginCheck" style="display: inline; cursor: pointer;">لدي حساب بالفعل (تسجيل دخول)</label>
+          <label for="isLoginCheck" style="display: inline; cursor: pointer; color: var(--neon-cyan);">لدي حساب بالفعل (تسجيل دخول)</label>
         </div>
-        <button type="submit" id="sendOtpBtn" class="btn btn-primary" style="width: 100%;">إرسال رمز التحقق 🔑</button>
+        <button type="submit" id="sendOtpBtn" class="btn btn-pink" style="width: 100%;">إرسال رمز التحقق 🔑</button>
       </form>
 
       <form id="otpVerifyForm" class="hidden" onsubmit="handleVerifyOtp(event)">
         <div class="form-group">
           <label>رمز التحقق (OTP)</label>
-          <input type="text" id="authOtp" required placeholder="أدخل الرمز هنا">
+          <input type="text" id="authOtp" required placeholder="أدخل الكود المكون من 6 أرقام">
         </div>
-        <button type="submit" id="verifyOtpBtn" class="btn btn-success" style="width: 100%;">تأكيد الدخول 🚀</button>
+        <button type="submit" id="verifyOtpBtn" class="btn btn-cyan" style="width: 100%;">تأكيد الدخول ودخول السيرفر 🚀</button>
       </form>
     </div>
   </div>
 
-  <!-- 🚨 نافذة تقديم الشكاوى والمقترحات -->
+  <!-- ================= 🌐 FULL PAGE 2: DASHBOARD PAGE ================= -->
+  <div id="dashboardPage" class="page-view hidden">
+    <header>
+      <div class="brand-logo">🦅 FALCON ROLEPLAY</div>
+      <div class="nav-actions">
+        <button onclick="toggleMenu()" class="btn btn-cyan btn-sm">القائمة ☰</button>
+        <div id="navDropdown" class="dropdown-menu">
+          <button onclick="openComplaintModal()" class="dropdown-item">تقديم شكوى 📋</button>
+          <button onclick="handleLogout()" class="dropdown-item" style="color: var(--neon-red);">تسجيل الخروج 🚪</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="container">
+      <!-- الجانب الأيسر: البروفايل والأخبار -->
+      <div>
+        <div class="card">
+          <div class="profile-badge">
+            <div class="avatar" id="avatarLetter">F</div>
+            <div>
+              <h3 id="profFullName" style="font-size: 16px; font-weight: 800;">...</h3>
+              <p id="profIgn" style="font-size: 12px; color: var(--neon-cyan);">@...</p>
+            </div>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 6px;">الكود الشخصي: <b id="profCode" style="color: var(--neon-pink);">...</b></p>
+          <p style="font-size: 13px; color: var(--text-muted);">المستوى: <b id="profLevel" style="color:#fff;">1</b> | الوظيفة: <b id="profJob" style="color:#fff;">مواطن</b></p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">📢 الأخبار والتعميمات</div>
+          <div id="newsList">
+            <p style="font-size: 12px; color: var(--text-muted);">جاري تحميل الأخبار...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- الجانب الأيمن: البلاغات والشات -->
+      <div>
+        <div class="card">
+          <div class="card-header">🚨 إرسال بلاغ عاجل للشرطة</div>
+          <form onsubmit="handleSendEmergency(event)">
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px;">
+              <div class="form-group">
+                <label>نوع البلاغ</label>
+                <select id="emType">
+                  <option value="طلب شرطة 🚔">طلب شرطة 🚔</option>
+                  <option value="بلاغ سرقة 💰">بلاغ سرقة 💰</option>
+                  <option value="حالة طوارئ ⚠️">حالة طوارئ ⚠️</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>تفاصيل الموقع / البلاغ</label>
+                <input type="text" id="emLocation" required placeholder="الموقع بالتفصيل...">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-pink" style="width: 100%;">إرسال النداء العاجل 📡</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-header">💬 القضايا النشطة والمحادثات المباشرة</div>
+          <div id="emergenciesList">
+            <p style="font-size: 12px; color: var(--text-muted);">جاري تحميل القضايا...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🚨 Modal الشكاوى -->
   <div id="complaintModal" class="modal-overlay hidden">
-    <div class="modal-body">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <h3 style="color: var(--accent-gold);">تقديم شكوى / بلاغ 📋</h3>
-        <button onclick="closeComplaintModal()" style="background: none; border: none; color: #fff; cursor: pointer;">✕</button>
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="color: var(--neon-cyan);">تقديم شكوى رسمية 📋</h3>
+        <button onclick="closeComplaintModal()" style="background:none; border:none; color:#fff; cursor:pointer; font-size:18px;">✕</button>
       </div>
       <form onsubmit="handleSendEmergencyModal(event)">
         <div class="form-group">
-          <label>نوع البلاغ / الشكوى</label>
+          <label>نوع الشكوى</label>
           <select id="modalEmType">
             <option value="سرقة / احتيال">سرقة / احتيال</option>
             <option value="اعتداء / قتل">اعتداء / قتل</option>
             <option value="شكوى ضد لاعب">شكوى ضد لاعب</option>
             <option value="مخالفة قوانين السيرفر">مخالفة قوانين السيرفر</option>
-            <option value="آخر">آخر</option>
           </select>
         </div>
         <div class="form-group">
-          <label>الموقع / التفاصيل الكاملة</label>
-          <textarea id="modalEmLocation" rows="4" required placeholder="اشرح الشكوى والموقع بالتفصيل..."></textarea>
+          <label>تفاصيل الشكوى</label>
+          <textarea id="modalEmLocation" rows="4" required placeholder="اكتب الشكوى والمسؤولين عنها..."></textarea>
         </div>
-        <button type="submit" class="btn btn-warning" style="width: 100%;">إرسال البلاغ فوراً 🚀</button>
+        <button type="submit" class="btn btn-cyan" style="width: 100%;">إرسال الشكوى للإدارة 🚀</button>
       </form>
     </div>
   </div>
 
-  <!-- 🌐 الشريط العلوي Header -->
-  <header>
-    <div class="logo">🦅 Falcon Server</div>
-    <div class="header-actions">
-      <button onclick="toggleMenu()" class="btn btn-primary btn-sm">القائمة ☰</button>
-      <div id="navDropdown" class="dropdown-menu">
-        <button onclick="openComplaintModal()" class="dropdown-item">تقديم شكوى 📋</button>
-        <button onclick="handleLogout()" class="dropdown-item" style="color: var(--accent-red);">تسجيل الخروج 🚪</button>
-      </div>
-    </div>
-  </header>
-
-  <!-- 📐 المحتوى الرئيسي -->
-  <div class="container">
-    
-    <!-- الجانب الأيسر: الملف والأخبار -->
-    <div>
-      <div class="card">
-        <div class="card-title">الملف الشخصي 👤</div>
-        <p style="font-size: 15px; font-weight: bold;" id="profFullName">...</p>
-        <p class="text-muted">اسم اللاعب: <span id="profIgn" style="color: #fff;">...</span></p>
-        <p class="text-muted">كود اللاعب: <span id="profCode" style="color: var(--accent-gold);">...</span></p>
-        <p class="text-muted">المستوى: <span id="profLevel" style="color: #fff;">1</span> | الوظيفة: <span id="profJob" style="color: #fff;">مواطن</span></p>
-      </div>
-
-      <div class="card">
-        <div class="card-title">آخر الأخبار 📢</div>
-        <div id="newsList">
-          <p class="text-muted">جاري تحميل الأخبار...</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- الجانب الأيمن: البلاغات والقضايا -->
-    <div>
-      <div class="card">
-        <div class="card-title">إرسال بلاغ عاجل 🚨</div>
-        <form onsubmit="handleSendEmergency(event)">
-          <div style="display: grid; grid-template-columns: 1fr 2fr gap: 10px;">
-            <div class="form-group">
-              <label>النوع</label>
-              <select id="emType">
-                <option value="طلب شرطة 🚔">طلب شرطة 🚔</option>
-                <option value="بلاغ سرقة 💰">بلاغ سرقة 💰</option>
-                <option value="حالة طوارئ ⚠️">حالة طوارئ ⚠️</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>الموقع / تفاصيل البلاغ</label>
-              <input type="text" id="emLocation" required placeholder="مثال: البنك المركزي / الحي الشمالي">
-            </div>
-          </div>
-          <button type="submit" class="btn btn-danger" style="width: 100%;">إرسال النداء 📡</button>
-        </form>
-      </div>
-
-      <div class="card">
-        <div class="card-title">سجل القضايا والمحادثات المباشرة 💬</div>
-        <div id="emergenciesList">
-          <p class="text-muted">جاري تحميل القضايا...</p>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
   <script>
-    // ⚠️ استبدل هذا الرابط برابط Google Apps Script الخاص بك (المنتهي بـ /exec)
+    // ⚠️ ضع رابط Apps Script الخاص بك هنا
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-dIJJ8rjiwbt-ZFk3qjSYv6UjoUKC6PXydut-lvR6VYUepOj15o9Db7Dr1hIjSMrLFw/exec";
 
     let state = {
@@ -410,7 +516,7 @@
 
     let isUserTyping = false;
 
-    // --- 🔒 1. حماية أدوات المطور (Anti-F12 & Right-Click) ---
+    // --- 🔒 حماية أدوات المطور (F12) والماوس الأيمن ---
     document.addEventListener('keydown', function(e) {
       if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
       if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) { e.preventDefault(); return false; }
@@ -418,20 +524,22 @@
     });
     document.addEventListener('contextmenu', e => e.preventDefault());
 
-    // --- 🚀 2. إدارة التحديث التلقائي بدون تقطيع ---
+    // --- 🚀 التبديل بين الصفحات وإدارة الجلسة ---
     window.onload = () => {
       if (state.email) {
-        document.getElementById("authModal").classList.add("hidden");
+        switchPage('dashboardPage');
         fetchDashboardData(false);
+      } else {
+        switchPage('authPage');
       }
-      
+
       document.addEventListener("click", (e) => {
-        if (!e.target.closest('.header-actions')) {
+        if (!e.target.closest('.nav-actions')) {
           document.getElementById("navDropdown").classList.remove("show");
         }
       });
 
-      // إيقاف التحديث عند التركيز في خانات الكتابة
+      // منع التقطيع أثناء الكتابة
       document.addEventListener('focusin', (e) => {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
           isUserTyping = true;
@@ -449,13 +557,18 @@
         }
       });
 
-      // التحديث الصامت كل 4 ثوانٍ
+      // التحديث الصامت الذكي
       setInterval(() => {
         if (state.email && !isUserTyping) {
           fetchDashboardData(true);
         }
       }, 4000);
     };
+
+    function switchPage(pageId) {
+      document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
+      document.getElementById(pageId).classList.remove('hidden');
+    }
 
     function toggleMenu() { document.getElementById("navDropdown").classList.toggle("show"); }
     function openComplaintModal() { document.getElementById("navDropdown").classList.remove("show"); document.getElementById("complaintModal").classList.remove("hidden"); }
@@ -465,7 +578,7 @@
       document.getElementById("registerFields").classList.toggle("hidden", isLogin);
     }
 
-    // --- 🔑 3. الدخول والتحقق بـ OTP ---
+    // --- 🔑 الدخول والـ OTP ---
     async function handleSendOtp(e) {
       e.preventDefault();
       const email = document.getElementById("authEmail").value.trim();
@@ -483,9 +596,9 @@
           state.email = email;
           document.getElementById("otpReqForm").classList.add("hidden");
           document.getElementById("otpVerifyForm").classList.remove("hidden");
-          document.getElementById("authSubtitle").innerText = "أدخل رمز OTP المرسل إلى بريدك الإلكتروني";
+          document.getElementById("authSubtitle").innerText = "أدخل رمز OTP المرسل لإيميلك";
         } else { alert("خطأ: " + res.message); }
-      } catch (err) { alert("فشل الاتصال بالسيرفر! تأكد من رابط Google Apps Script والإعدادات."); }
+      } catch (err) { alert("فشل الاتصال بالسيرفر!"); }
       finally { btn.innerText = "إرسال رمز التحقق 🔑"; btn.disabled = false; }
     }
 
@@ -499,14 +612,14 @@
         const res = await apiCall({ action: "verifyOtp", email: state.email, otp });
         if (res.status === "success") {
           localStorage.setItem("falcon_email", state.email);
-          document.getElementById("authModal").classList.add("hidden");
+          switchPage('dashboardPage');
           renderDashboard(res, false);
         } else { alert("خطأ: " + res.message); }
-      } catch (err) { alert("فشل التحقق من الرمز!"); }
-      finally { btn.innerText = "تأكيد الدخول 🚀"; btn.disabled = false; }
+      } catch (err) { alert("فشل التحقق!"); }
+      finally { btn.innerText = "تأكيد الدخول ودخول السيرفر 🚀"; btn.disabled = false; }
     }
 
-    // --- 📊 4. جلب وعرض البيانات ---
+    // --- 📊 جلب وتحديث البيانات ---
     async function fetchDashboardData(isSilent = false) {
       if (!state.email) return;
       try {
@@ -519,50 +632,51 @@
     function renderDashboard(data, isSilent = false) {
       state.userData = data;
 
-      document.getElementById("profIgn").innerText = data.ign || "";
-      document.getElementById("profFullName").innerText = data.fullName || "";
-      document.getElementById("profCode").innerText = data.playerCode || "";
+      document.getElementById("profFullName").innerText = data.fullName || "لاعب فالكون";
+      document.getElementById("profIgn").innerText = "@" + (data.ign || "player");
+      document.getElementById("profCode").innerText = data.playerCode || "---";
       document.getElementById("profLevel").innerText = data.level || "1";
       document.getElementById("profJob").innerText = data.job || "مواطن";
+      document.getElementById("avatarLetter").innerText = (data.fullName || "F").charAt(0).toUpperCase();
 
       const newsContainer = document.getElementById("newsList");
       if (data.news && data.news.length > 0) {
         newsContainer.innerHTML = data.news.map(item => `
-          <div class="news-item">
-            <div><b>${item.title}</b> <span class="news-badge">${item.badge}</span></div>
-            <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">${item.content}</p>
-            <small style="font-size: 10px; color: #6b7280;">${item.date}</small>
+          <div class="news-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <b>${item.title}</b> <span class="news-tag">${item.badge}</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">${item.content}</p>
           </div>
         `).join("");
       } else {
-        newsContainer.innerHTML = `<p class="text-muted">لا توجد أخبار جديدة.</p>`;
+        newsContainer.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">لا توجد أخبار جديدة.</p>`;
       }
 
       const list = data.isPolice ? data.allEmergenciesForPolice : data.myEmergencies;
       renderEmergencies(list, data.isPolice, isSilent);
     }
 
-    // --- 💬 5. عرض المحادثات والتحكم الصامت ---
+    // --- 💬 عرض البلاغات والشات الصامت ---
     function renderEmergencies(list, isPolice, isSilent) {
       const container = document.getElementById("emergenciesList");
       if (!list || list.length === 0) {
-        container.innerHTML = "<p class='text-muted'>لا توجد قضايا مسجلة حالياً.</p>";
+        container.innerHTML = "<p style='font-size:12px; color:var(--text-muted);'>لا توجد قضايا مسجلة حالياً.</p>";
         return;
       }
 
-      // تحديث الشات فقط في التحديث الصامت لتجنب التقطيع
       if (isSilent && container.children.length === list.length) {
         list.forEach(item => {
           const chatBox = document.getElementById(`chatBox-${item.rowId}`);
           if (chatBox) {
             let chatContent = (item.chatMessages || []).map(msg => `
-              <div class="chat-bubble ${msg.isPolice ? 'police-msg' : (msg.senderName === 'النظام' ? 'system-msg' : 'user-msg')}">
+              <div class="msg-bubble ${msg.isPolice ? 'msg-police' : (msg.senderName === 'النظام' ? 'msg-system' : 'msg-user')}">
                 <b>${msg.senderName}:</b> ${msg.text}
               </div>
             `).join("");
             
             if (chatBox.innerHTML.trim() !== chatContent.trim()) {
-              chatBox.innerHTML = chatContent || '<p class="text-muted" style="font-size: 12px;">لا توجد رسائل بعد.</p>';
+              chatBox.innerHTML = chatContent || '<p style="font-size: 11px; color: var(--text-muted);">لا توجد رسائل بعد.</p>';
               chatBox.scrollTop = chatBox.scrollHeight;
             }
           }
@@ -578,40 +692,40 @@
         let policeActions = "";
         if (isPolice) {
           policeActions = `
-            <div style="display:flex; gap:5px; margin: 10px 0;">
-              ${!isWorking && !isClosed ? `<button onclick="handlePoliceAction('acceptEmergency', ${item.rowId})" class="btn btn-success btn-sm">مباشرة القضية 🚔</button>` : ''}
-              ${!isClosed ? `<button onclick="handlePoliceAction('closeEmergency', ${item.rowId})" class="btn btn-danger btn-sm">إغلاق القضية 🔒</button>` : `<button onclick="handlePoliceAction('reopenEmergency', ${item.rowId})" class="btn btn-warning btn-sm">إعادة فتح القضية 🔓</button>`}
+            <div style="display:flex; gap:8px; margin: 10px 0;">
+              ${!isWorking && !isClosed ? `<button onclick="handlePoliceAction('acceptEmergency', ${item.rowId})" class="btn btn-green btn-sm">مباشرة القضية 🚔</button>` : ''}
+              ${!isClosed ? `<button onclick="handlePoliceAction('closeEmergency', ${item.rowId})" class="btn btn-red btn-sm">إغلاق القضية 🔒</button>` : `<button onclick="handlePoliceAction('reopenEmergency', ${item.rowId})" class="btn btn-cyan btn-sm">إعادة فتح 🔓</button>`}
             </div>
           `;
         }
 
         let chatContent = (item.chatMessages || []).map(msg => `
-          <div class="chat-bubble ${msg.isPolice ? 'police-msg' : (msg.senderName === 'النظام' ? 'system-msg' : 'user-msg')}">
+          <div class="msg-bubble ${msg.isPolice ? 'msg-police' : (msg.senderName === 'النظام' ? 'msg-system' : 'msg-user')}">
             <b>${msg.senderName}:</b> ${msg.text}
           </div>
         `).join("");
 
         const card = document.createElement("div");
-        card.className = `emergency-card ${isClosed ? 'status-closed' : (isWorking ? 'status-active' : '')}`;
+        card.className = `emergency-item ${isClosed ? 'closed' : 'active'}`;
         card.innerHTML = `
-          <div class="card-top">
-            <h4 style="color: var(--accent-blue);">قضية #${item.rowId} - ${item.type}</h4>
-            <span class="news-badge">${item.status}</span>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <h4 style="color:var(--neon-pink);">قضية #${item.rowId} - ${item.type}</h4>
+            <span class="news-tag">${item.status}</span>
           </div>
-          <p style="font-size: 13px;"><b>صاحب البلاغ:</b> ${item.fullName} (${item.playerCode})</p>
+          <p style="font-size: 13px;"><b>المبلغ:</b> ${item.fullName} (${item.playerCode})</p>
           <p style="font-size: 13px;"><b>الموقع:</b> ${item.location}</p>
-          <p style="font-size: 12px; color: var(--text-muted);"><b>الضابط المباشر:</b> ${item.officerName}</p>
+          <p style="font-size: 12px; color: var(--text-muted);"><b>الضابط:</b> ${item.officerName}</p>
 
           ${policeActions}
 
-          <div class="chat-container">
-            <div class="chat-messages" id="chatBox-${item.rowId}">
-              ${chatContent || '<p class="text-muted" style="font-size: 12px;">لا توجد رسائل بعد.</p>'}
+          <div class="chat-box">
+            <div class="chat-logs" id="chatBox-${item.rowId}">
+              ${chatContent || '<p style="font-size: 11px; color: var(--text-muted);">لا توجد رسائل بعد.</p>'}
             </div>
             ${!isClosed ? `
-              <div class="chat-input-bar">
+              <div style="display:flex; gap:6px;">
                 <input type="text" id="chatInput-${item.rowId}" placeholder="اكتب رسالة..." onkeypress="if(event.key==='Enter') sendChatMessage(${item.rowId})">
-                <button onclick="sendChatMessage(${item.rowId})" class="btn btn-primary btn-sm">إرسال</button>
+                <button onclick="sendChatMessage(${item.rowId})" class="btn btn-cyan btn-sm">إرسال</button>
               </div>
             ` : ''}
           </div>
@@ -620,7 +734,7 @@
       });
     }
 
-    // --- 📤 6. إرسال البيانات والتفاعل ---
+    // --- 📤 التفاعلات وإرسال الأوامر ---
     async function handleSendEmergency(e) {
       e.preventDefault();
       const type = document.getElementById("emType").value;
