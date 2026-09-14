@@ -3,89 +3,156 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Falcon MC - لوحة التحكم والقضايا</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- 🔍 إعدادات محركات البحث SEO -->
+  <title>Falcon Server - سيرفر فالكون ماينكرافت</title>
+  <meta name="description" content="الموقع الرسمي لسيرفر Falcon. تابع الأخبار، قدم الشكاوى والبلاغات، وتواصل مع اللاعبين والشرطة مباشرة.">
+  <meta name="keywords" content="Falcon, Falcon Server, سيرفر فالكون, ماينكرافت, Minecraft Server">
+  <meta name="robots" content="index, follow">
+  
+  <!-- 🏷️ ضع كود إثبات ملكية جوجل هنا عند استلامه (Meta Tag) -->
+  <!-- <meta name="google-site-verification" content="كود-التفعيل-هنا" /> -->
+
   <style>
     :root {
-      --bg-color: #0b0f19;
-      --card-bg: #161e2e;
-      --card-border: #233044;
-      --accent-green: #10b981;
-      --accent-blue: #3b82f6;
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --accent-blue: #38bdf8;
+      --accent-green: #22c55e;
       --accent-red: #ef4444;
-      --accent-yellow: #f59e0b;
-      --text-main: #f3f4f6;
-      --text-muted: #9ca3af;
+      --accent-gold: #f59e0b;
+      --text-light: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Cairo', sans-serif;
-      user-select: none; /* منع تحديد النصوص لمنع التفتيش */
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      min-height: 100vh;
+      background-color: var(--bg-dark);
+      color: var(--text-light);
       padding-bottom: 40px;
+      user-select: none; /* منع تحديد النصوص */
     }
 
-    /* Modal / Auth Overlay */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(5, 7, 13, 0.95);
+    /* --- Navbar --- */
+    header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 15px 20px;
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      z-index: 1000;
-      padding: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .modal-card {
+    .logo {
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-actions {
+      position: relative;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      left: 0;
+      top: 40px;
       background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 30px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      display: none;
+      flex-direction: column;
+      width: 160px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      z-index: 101;
+    }
+
+    .dropdown-menu.show {
+      display: flex;
+    }
+
+    .dropdown-item {
+      padding: 10px 15px;
+      color: var(--text-light);
+      text-decoration: none;
+      background: none;
+      border: none;
+      text-align: right;
+      cursor: pointer;
       width: 100%;
-      max-width: 450px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     }
 
-    .modal-card h2 {
-      color: var(--accent-green);
+    .dropdown-item:hover {
+      background-color: var(--border-color);
+    }
+
+    /* --- Container & Layout --- */
+    .container {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 0 15px;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--accent-blue);
       margin-bottom: 15px;
-      font-size: 24px;
-      text-align: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
     }
 
-    /* Form Styles */
+    /* --- Forms & Controls --- */
     .form-group {
       margin-bottom: 15px;
-      text-align: right;
     }
 
-    .form-group label {
+    label {
       display: block;
-      margin-bottom: 5px;
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-muted);
+      margin-bottom: 5px;
     }
 
     input, select, textarea {
       width: 100%;
-      padding: 12px;
-      background: #0d131f;
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
+      padding: 10px;
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
       color: #fff;
       font-size: 14px;
       outline: none;
-      transition: border 0.2s;
-      user-select: text; /* السماح بالكتابة */
     }
 
     input:focus, select:focus, textarea:focus {
@@ -93,191 +160,46 @@
     }
 
     .btn {
-      width: 100%;
-      padding: 12px;
+      padding: 10px 16px;
       border: none;
-      border-radius: 8px;
-      font-weight: 700;
+      border-radius: 6px;
+      font-weight: bold;
       cursor: pointer;
-      transition: 0.2s opacity;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      transition: opacity 0.2s;
     }
 
     .btn:hover { opacity: 0.9; }
-    .btn-primary { background: var(--accent-blue); color: #fff; }
-    .btn-success { background: var(--accent-green); color: #fff; }
-    .btn-danger { background: var(--accent-red); color: #fff; }
-    .btn-warning { background: var(--accent-yellow); color: #111; }
-    .btn-sm { width: auto; padding: 6px 12px; font-size: 13px; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background-color: var(--accent-blue); color: #000; }
+    .btn-success { background-color: var(--accent-green); color: #000; }
+    .btn-danger { background-color: var(--accent-red); color: #fff; }
+    .btn-warning { background-color: var(--accent-gold); color: #000; }
+    .btn-sm { padding: 6px 10px; font-size: 12px; }
 
-    /* Layout Header & Navigation */
-    header {
-      background: var(--card-bg);
-      border-bottom: 1px solid var(--card-border);
-      padding: 15px 5%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: relative;
-    }
-
-    .logo {
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--accent-green);
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    /* أزرار الثلاث شرط (Hamburger Menu) */
-    .hamburger-menu {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      cursor: pointer;
-      padding: 8px;
-      border-radius: 6px;
-      background: #0d131f;
-      border: 1px solid var(--card-border);
-    }
-
-    .hamburger-menu span {
-      width: 22px;
-      height: 3px;
-      background-color: var(--text-main);
-      border-radius: 2px;
-    }
-
-    /* القائمة المنسدلة من الثلاث شرط */
-    .nav-dropdown {
-      position: absolute;
-      top: 65px;
-      left: 5%;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      width: 220px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-      display: none;
-      flex-direction: column;
-      z-index: 500;
-      overflow: hidden;
-    }
-
-    .nav-dropdown.show {
-      display: flex;
-    }
-
-    .nav-dropdown button {
-      padding: 12px 16px;
-      color: var(--text-main);
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid var(--card-border);
-      text-align: right;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      transition: background 0.2s;
-    }
-
-    .nav-dropdown button:hover {
-      background: #0d131f;
-      color: var(--accent-green);
-    }
-
-    /* Main Container */
-    .container {
-      max-width: 1100px;
-      margin: 25px auto;
-      padding: 0 20px;
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 20px;
-    }
-
-    @media (max-width: 768px) {
-      .container { grid-template-columns: 1fr; }
-    }
-
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .card h3 {
-      font-size: 18px;
-      margin-bottom: 15px;
-      border-bottom: 1px solid var(--card-border);
-      padding-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .profile-info {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .profile-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px;
-      background: #0d131f;
-      border-radius: 6px;
-    }
-
+    /* --- News Section --- */
     .news-item {
-      padding: 12px;
-      background: #0d131f;
-      border-right: 3px solid var(--accent-blue);
-      border-radius: 6px;
-      margin-bottom: 10px;
+      padding: 10px;
+      border-bottom: 1px solid var(--border-color);
     }
-
+    .news-item:last-child { border-bottom: none; }
     .news-badge {
       background: var(--accent-blue);
-      color: #fff;
+      color: #000;
       font-size: 10px;
       padding: 2px 6px;
       border-radius: 4px;
-      margin-left: 5px;
     }
 
-    /* Emergencies Cards */
+    /* --- Emergency Cards & Chat --- */
     .emergency-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
       padding: 15px;
       margin-bottom: 15px;
-      border-right: 4px solid var(--accent-blue);
-      transition: all 0.3s ease;
     }
-
-    .emergency-card.status-closed {
-      border-right-color: var(--accent-red);
-      opacity: 0.85;
-    }
-
-    .emergency-card.status-active {
-      border-right-color: var(--accent-green);
-    }
+    .emergency-card.status-active { border-right: 4px solid var(--accent-gold); }
+    .emergency-card.status-closed { border-right: 4px solid var(--accent-red); opacity: 0.8; }
 
     .card-top {
       display: flex;
@@ -286,592 +208,199 @@
       margin-bottom: 10px;
     }
 
-    .badge {
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: bold;
-      background: #233044;
-    }
-
-    .controls-group {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin: 12px 0;
-    }
-
     .chat-container {
-      background: #0d131f;
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
+      margin-top: 15px;
+      background: #1e293b;
+      border-radius: 6px;
       padding: 10px;
-      margin-top: 10px;
     }
 
     .chat-messages {
-      max-height: 180px;
+      max-height: 150px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      padding-left: 5px;
+      margin-bottom: 10px;
+      padding-right: 5px;
     }
 
     .chat-bubble {
-      padding: 8px 12px;
+      padding: 6px 10px;
       border-radius: 6px;
-      font-size: 13px;
+      font-size: 12px;
       max-width: 85%;
     }
-
-    .chat-bubble.police-msg {
-      background: #1e3a8a;
-      color: #bfdbfe;
-      align-self: flex-start;
-    }
-
-    .chat-bubble.user-msg {
-      background: #334155;
-      color: #f1f5f9;
-      align-self: flex-end;
-    }
-
-    .chat-bubble.system-msg {
-      background: #374151;
-      color: #d1d5db;
-      align-self: center;
-      text-align: center;
-      font-size: 11px;
-    }
+    .chat-bubble.user-msg { background: #334155; align-self: flex-start; }
+    .chat-bubble.police-msg { background: #1e3a8a; border: 1px solid var(--accent-blue); align-self: flex-end; }
+    .chat-bubble.system-msg { background: #374151; color: var(--accent-gold); text-align: center; width: 100%; }
 
     .chat-input-bar {
       display: flex;
       gap: 5px;
-      margin-top: 8px;
     }
 
+    /* --- Modals --- */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-body {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 25px;
+      width: 90%;
+      max-width: 400px;
+    }
     .hidden { display: none !important; }
+    .text-muted { color: var(--text-muted); font-size: 13px; }
   </style>
 </head>
 <body>
 
-  <!-- 1. تعطيل وإغلاق الكونسول بالفورمات ومنع التفتيش -->
- <script>
-  // ⚠️ ضع رابط Apps Script الخاص بك هنا
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-dIJJ8rjiwbt-ZFk3qjSYv6UjoUKC6PXydut-lvR6VYUepOj15o9Db7Dr1hIjSMrLFw/exec";
-
-  let state = {
-    email: localStorage.getItem("falcon_email") || "",
-    userData: null
-  };
-
-  // متغير للتحقق مما إذا كان المستخدم يكتب حالياً لمنع التقطيع
-  let isUserTyping = false;
-
-  window.onload = () => {
-    if (state.email) {
-      document.getElementById("authModal").classList.add("hidden");
-      fetchDashboardData(false);
-    }
-    
-    // إغلاق القائمة المنسدلة عند الضغط في أي مكان خارجها
-    document.addEventListener("click", (e) => {
-      if (!e.target.closest('.header-actions')) {
-        document.getElementById("navDropdown").classList.remove("show");
-      }
-    });
-
-    // اكتشاف هل المستخدم بيكتب حالياً في أي مربع نص لتعطيل التحديث أثناء الكتابة
-    document.addEventListener('focusin', (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        isUserTyping = true;
-      }
-    });
-
-    document.addEventListener('focusout', (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        setTimeout(() => {
-          const active = document.activeElement;
-          if (!active || (active.tagName !== 'INPUT' && active.tagName !== 'TEXTAREA')) {
-            isUserTyping = false;
-          }
-        }, 500);
-      }
-    });
-
-    // --- 🔄 التحديث الصامت الذكي (كل 4 ثوانٍ) بشرط عدم الكتابة ---
-    setInterval(() => {
-      if (state.email && !isUserTyping) {
-        fetchDashboardData(true); // true = تحديث صامت بدون تقطيع
-      }
-    }, 4000);
-  };
-
-  function toggleMenu() {
-    document.getElementById("navDropdown").classList.toggle("show");
-  }
-
-  function openComplaintModal() {
-    document.getElementById("navDropdown").classList.remove("show");
-    document.getElementById("complaintModal").classList.remove("hidden");
-  }
-
-  function closeComplaintModal() {
-    document.getElementById("complaintModal").classList.add("hidden");
-  }
-
-  function toggleAuthMode() {
-    const isLogin = document.getElementById("isLoginCheck").checked;
-    document.getElementById("registerFields").classList.toggle("hidden", isLogin);
-  }
-
-  // --- 1. التسجيل والدخول بـ OTP ---
-  async function handleSendOtp(e) {
-    e.preventDefault();
-    const email = document.getElementById("authEmail").value.trim();
-    const ign = document.getElementById("authIgn").value.trim();
-    const fullName = document.getElementById("authFullName").value.trim();
-    const age = document.getElementById("authAge").value.trim();
-    const isLogin = document.getElementById("isLoginCheck").checked;
-
-    const btn = document.getElementById("sendOtpBtn");
-    btn.innerText = "جاري الإرسال...";
-    btn.disabled = true;
-
-    try {
-      const res = await apiCall({
-        action: "sendOtp",
-        email: email,
-        ign: ign,
-        fullName: fullName,
-        age: age,
-        isLogin: isLogin
-      });
-
-      if (res.status === "success") {
-        state.email = email;
-        document.getElementById("otpReqForm").classList.add("hidden");
-        document.getElementById("otpVerifyForm").classList.remove("hidden");
-        document.getElementById("authSubtitle").innerText = "أدخل رمز OTP المرسل إلى بريدك الإلكتروني";
-      } else {
-        alert("خطأ: " + res.message);
-      }
-    } catch (err) {
-      alert("فشل الاتصال بالسيرفر!");
-    } finally {
-      btn.innerText = "إرسال رمز التحقق 🔑";
-      btn.disabled = false;
-    }
-  }
-
-  async function handleVerifyOtp(e) {
-    e.preventDefault();
-    const otp = document.getElementById("authOtp").value.trim();
-    const btn = document.getElementById("verifyOtpBtn");
-    btn.innerText = "جاري التحقق...";
-    btn.disabled = true;
-
-    try {
-      const res = await apiCall({
-        action: "verifyOtp",
-        email: state.email,
-        otp: otp
-      });
-
-      if (res.status === "success") {
-        localStorage.setItem("falcon_email", state.email);
-        document.getElementById("authModal").classList.add("hidden");
-        renderDashboard(res, false);
-      } else {
-        alert("خطأ: " + res.message);
-      }
-    } catch (err) {
-      alert("فشل التحقق من الرمز!");
-    } finally {
-      btn.innerText = "تأكيد الدخول 🚀";
-      btn.disabled = false;
-    }
-  }
-
-  // --- 2. جلب وتحديث البيانات ---
-  async function fetchDashboardData(isSilent = false) {
-    if (!state.email) return;
-    try {
-      const res = await apiCall({
-        action: "getDashboardData",
-        email: state.email
-      });
-      if (res.status === "success") {
-        renderDashboard(res, isSilent);
-      } else if (!isSilent) {
-        handleLogout();
-      }
-    } catch (err) {}
-  }
-
-  function renderDashboard(data, isSilent = false) {
-    state.userData = data;
-
-    // تحديث ملف اللاعب
-    document.getElementById("profIgn").innerText = data.ign;
-    document.getElementById("profFullName").innerText = data.fullName;
-    document.getElementById("profCode").innerText = data.playerCode;
-    document.getElementById("profLevel").innerText = data.level;
-    document.getElementById("profJob").innerText = data.job;
-
-    // تحديث الأخبار
-    const newsContainer = document.getElementById("newsList");
-    if (data.news && data.news.length > 0) {
-      newsContainer.innerHTML = data.news.map(item => `
-        <div class="news-item">
-          <div><b>${item.title}</b> <span class="news-badge">${item.badge}</span></div>
-          <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">${item.content}</p>
-          <small style="font-size: 10px; color: #6b7280;">${item.date}</small>
-        </div>
-      `).join("");
-    } else {
-      newsContainer.innerHTML = `<p class="text-muted">لا توجد أخبار جديدة.</p>`;
-    }
-
-    // تحديث القضايا والشكاوى بشكل سلس
-    const list = data.isPolice ? data.allEmergenciesForPolice : data.myEmergencies;
-    renderEmergencies(list, data.isPolice, isSilent);
-  }
-
-  // --- 3. عرض القضايا الذكي بون تقطيع أثتاء التحديث ---
-  function renderEmergencies(list, isPolice, isSilent) {
-    const container = document.getElementById("emergenciesList");
-
-    if (!list || list.length === 0) {
-      container.innerHTML = "<p class='text-muted'>لا توجد قضايا مسجلة حالياً.</p>";
-      return;
-    }
-
-    // إذا كان تحديث صامت والكروت موجودة بالفعل، سنكتفي بتحديث الشات والحالة فقط منعاً للتقطيع
-    if (isSilent && container.children.length === list.length) {
-      list.forEach(item => {
-        const chatBox = document.getElementById(`chatBox-${item.rowId}`);
-        if (chatBox) {
-          let chatContent = (item.chatMessages || []).map(msg => `
-            <div class="chat-bubble ${msg.isPolice ? 'police-msg' : (msg.senderName === 'النظام' ? 'system-msg' : 'user-msg')}">
-              <b>${msg.senderName}:</b> ${msg.text}
-            </div>
-          `).join("");
-          
-          // تحديث المحادثات فقط داخل الكرت
-          if (chatBox.innerHTML.trim() !== chatContent.trim()) {
-            chatBox.innerHTML = chatContent || '<p class="text-muted" style="font-size: 12px;">لا توجد رسائل بعد.</p>';
-            chatBox.scrollTop = chatBox.scrollHeight;
-          }
-        }
-      });
-      return;
-    }
-
-    // إذا كان تحديث عادي أو تغيير في عدد القضايا
-    container.innerHTML = "";
-
-    list.forEach(item => {
-      const isClosed = item.status.includes("مغلقة");
-      const isWorking = item.status.includes("المباشرة");
-
-      let policeActions = "";
-      if (isPolice) {
-        policeActions = `
-          <div class="controls-group">
-            ${!isWorking && !isClosed ? `
-              <button onclick="handlePoliceAction('acceptEmergency', ${item.rowId})" class="btn btn-success btn-sm">مباشرة القضية 🚔</button>
-            ` : ''}
-            
-            ${!isClosed ? `
-              <button onclick="handlePoliceAction('closeEmergency', ${item.rowId})" class="btn btn-danger btn-sm">إلغاء / إغلاق القضية 🔒</button>
-            ` : `
-              <button onclick="handlePoliceAction('reopenEmergency', ${item.rowId})" class="btn btn-warning btn-sm">إعادة فتح القضية 🔓</button>
-            `}
-          </div>
-        `;
-      }
-
-      let chatContent = (item.chatMessages || []).map(msg => `
-        <div class="chat-bubble ${msg.isPolice ? 'police-msg' : (msg.senderName === 'النظام' ? 'system-msg' : 'user-msg')}">
-          <b>${msg.senderName}:</b> ${msg.text}
-        </div>
-      `).join("");
-
-      const card = document.createElement("div");
-      card.className = `emergency-card ${isClosed ? 'status-closed' : (isWorking ? 'status-active' : '')}`;
-      card.innerHTML = `
-        <div class="card-top">
-          <h4 style="color: var(--accent-blue);">قضية #${item.rowId} - ${item.type}</h4>
-          <span class="badge">${item.status}</span>
-        </div>
-        <p style="font-size: 14px;"><b>صاحب البلاغ:</b> ${item.fullName} (${item.playerCode})</p>
-        <p style="font-size: 14px;"><b>الموقع / التفاصيل:</b> ${item.location}</p>
-        <p style="font-size: 13px; color: var(--text-muted);"><b>الضابط المباشر:</b> ${item.officerName}</p>
-        <small style="font-size: 11px; color: #6b7280;">التاريخ: ${item.date}</small>
-
-        ${policeActions}
-
-        <div class="chat-container">
-          <h5 style="font-size: 13px; margin-bottom: 5px;">💬 المحادثة المباشرة:</h5>
-          <div class="chat-messages" id="chatBox-${item.rowId}">
-            ${chatContent || '<p class="text-muted" style="font-size: 12px;">لا توجد رسائل بعد.</p>'}
-          </div>
-          
-          ${!isClosed ? `
-            <div class="chat-input-bar">
-              <input type="text" id="chatInput-${item.rowId}" placeholder="اكتب رسالتك..." onkeypress="if(event.key==='Enter') sendChatMessage(${item.rowId})">
-              <button onclick="sendChatMessage(${item.rowId})" class="btn btn-primary btn-sm">إرسال</button>
-            </div>
-          ` : '<p style="font-size: 11px; color: var(--accent-red); margin-top: 5px;"><i>هذه القضية مغلقة.</i></p>'}
-        </div>
-      `;
-
-      container.appendChild(card);
-    });
-  }
-
-  // --- 4. إرسال البلاغات والشكاوى ---
-  async function handleSendEmergency(e) {
-    e.preventDefault();
-    const type = document.getElementById("emType").value;
-    const location = document.getElementById("emLocation").value.trim();
-    await submitEmergency(type, location, () => {
-      document.getElementById("emLocation").value = "";
-    });
-  }
-
-  async function handleSendEmergencyModal(e) {
-    e.preventDefault();
-    const type = document.getElementById("modalEmType").value;
-    const location = document.getElementById("modalEmLocation").value.trim();
-    await submitEmergency(type, location, () => {
-      document.getElementById("modalEmLocation").value = "";
-      closeComplaintModal();
-    });
-  }
-
-  async function submitEmergency(type, location, callback) {
-    const res = await apiCall({
-      action: "sendEmergency",
-      playerCode: state.userData.playerCode,
-      fullName: state.userData.fullName,
-      type: type,
-      location: location
-    });
-
-    if (res.status === "success") {
-      alert("تم إرسال البلاغ / الشكوى بنجاح!");
-      callback();
-      fetchDashboardData(false);
-    }
-  }
-
-  // --- 5. تحكم الشرطة ---
-  async function handlePoliceAction(actionType, rowId) {
-    if (actionType === 'closeEmergency' && !confirm("هل أنت تأكد من إلغاء وإغلاق هذه القضية؟")) return;
-
-    const res = await apiCall({
-      action: actionType,
-      rowId: rowId,
-      officerName: state.userData.fullName
-    });
-
-    if (res.status === "success") {
-      fetchDashboardData(false);
-    }
-  }
-
-  // --- 6. إرسال الشات ---
-  async function sendChatMessage(rowId) {
-    const input = document.getElementById(`chatInput-${rowId}`);
-    const text = input.value.trim();
-    if (!text) return;
-
-    const res = await apiCall({
-      action: "sendChatMessage",
-      rowId: rowId,
-      senderName: state.userData.fullName,
-      text: text,
-      isPolice: state.userData.isPolice
-    });
-
-    if (res.status === "success") {
-      input.value = "";
-      fetchDashboardData(false);
-    }
-  }
-
-  async function apiCall(data) {
-    const response = await fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      body: JSON.stringify(data)
-    });
-    return await response.json();
-  }
-
-  function handleLogout() {
-    localStorage.removeItem("falcon_email");
-    location.reload();
-  }
-</script>
-
-  <!-- 2. نافذة المصادقة / التسجيل بـ OTP -->
+  <!-- 🛑 نافذة تسجيل الدخول بـ OTP -->
   <div id="authModal" class="modal-overlay">
-    <div class="modal-card">
-      <h2>🎮 Falcon MC</h2>
-      <p style="color: var(--text-muted); margin-bottom: 20px; text-align: center;" id="authSubtitle">سجل دخولك أو أنشئ حساباً جديداً</p>
-
+    <div class="modal-body">
+      <h3 style="margin-bottom: 10px; color: var(--accent-blue);">Falcon Portal 🦅</h3>
+      <p id="authSubtitle" class="text-muted" style="margin-bottom: 15px;">تسجيل الدخول / إنشاء حساب عبر رمز التحقق</p>
+      
       <form id="otpReqForm" onsubmit="handleSendOtp(event)">
         <div class="form-group">
-          <label>البريد الإلكتروني:</label>
-          <input type="email" id="authEmail" placeholder="example@gmail.com" required>
+          <label>البريد الإلكتروني</label>
+          <input type="email" id="authEmail" required placeholder="name@domain.com">
         </div>
-
         <div id="registerFields">
           <div class="form-group">
-            <label>اسم اللاعب (IGN):</label>
-            <input type="text" id="authIgn" placeholder="Steve">
+            <label>اسم اللاعب (IGN)</label>
+            <input type="text" id="authIgn" placeholder="مثال: Falcon_99">
           </div>
           <div class="form-group">
-            <label>الاسم الحقيقي الثنائي:</label>
-            <input type="text" id="authFullName" placeholder="أحمد علي">
+            <label>الاسم الكامل</label>
+            <input type="text" id="authFullName" placeholder="اسمك الحقيقي">
           </div>
           <div class="form-group">
-            <label>العمر:</label>
-            <input type="number" id="authAge" placeholder="18">
+            <label>العمر</label>
+            <input type="number" id="authAge" placeholder="15">
           </div>
         </div>
-
-        <div style="margin-bottom: 15px; text-align: right;">
+        <div style="margin-bottom: 15px;">
           <input type="checkbox" id="isLoginCheck" style="width: auto;" onchange="toggleAuthMode()">
           <label for="isLoginCheck" style="display: inline; cursor: pointer;">لدي حساب بالفعل (تسجيل دخول)</label>
         </div>
-
-        <button type="submit" id="sendOtpBtn" class="btn btn-primary">إرسال رمز التحقق 🔑</button>
+        <button type="submit" id="sendOtpBtn" class="btn btn-primary" style="width: 100%;">إرسال رمز التحقق 🔑</button>
       </form>
 
       <form id="otpVerifyForm" class="hidden" onsubmit="handleVerifyOtp(event)">
         <div class="form-group">
-          <label>رمز التحقق (OTP):</label>
-          <input type="text" id="authOtp" placeholder="أدخل الرمز المكون من 6 أرقام" required>
+          <label>رمز التحقق (OTP)</label>
+          <input type="text" id="authOtp" required placeholder="أدخل الرمز هنا">
         </div>
-        <button type="submit" id="verifyOtpBtn" class="btn btn-success">تأكيد الدخول 🚀</button>
+        <button type="submit" id="verifyOtpBtn" class="btn btn-success" style="width: 100%;">تأكيد الدخول 🚀</button>
       </form>
     </div>
   </div>
 
-  <!-- 3. نافذة تقديم الشكاوى / البلاغات (تفتح عند الضغط على "شكاوي") -->
+  <!-- 🚨 نافذة تقديم الشكاوى والمقترحات -->
   <div id="complaintModal" class="modal-overlay hidden">
-    <div class="modal-card">
+    <div class="modal-body">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <h3 style="color: var(--accent-green); margin:0;">📝 تقديم شكوى / بلاغ جديد</h3>
-        <button onclick="closeComplaintModal()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button>
+        <h3 style="color: var(--accent-gold);">تقديم شكوى / بلاغ 📋</h3>
+        <button onclick="closeComplaintModal()" style="background: none; border: none; color: #fff; cursor: pointer;">✕</button>
       </div>
-
       <form onsubmit="handleSendEmergencyModal(event)">
         <div class="form-group">
-          <label>نوع البلاغ / الشكوى:</label>
-          <select id="modalEmType" required>
-            <option value="سرقة 💰">سرقة 💰</option>
-            <option value="اعتداء / إطلاق نار 💥">اعتداء / إطلاق نار 💥</option>
-            <option value="حادث سير 🚗">حادث سير 🚗</option>
-            <option value="شكوى إدارية / مخالفة 📝">شكوى إدارية / مخالفة 📝</option>
-            <option value="خطورة عالية ⚠️">خطورة عالية ⚠️</option>
+          <label>نوع البلاغ / الشكوى</label>
+          <select id="modalEmType">
+            <option value="سرقة / احتيال">سرقة / احتيال</option>
+            <option value="اعتداء / قتل">اعتداء / قتل</option>
+            <option value="شكوى ضد لاعب">شكوى ضد لاعب</option>
+            <option value="مخالفة قوانين السيرفر">مخالفة قوانين السيرفر</option>
+            <option value="آخر">آخر</option>
           </select>
         </div>
         <div class="form-group">
-          <label>تفاصيل الشكوى والموقع:</label>
-          <textarea id="modalEmLocation" rows="4" placeholder="اكتب التفاصيل الكاملة أو الشكوى والموقع..." required></textarea>
+          <label>الموقع / التفاصيل الكاملة</label>
+          <textarea id="modalEmLocation" rows="4" required placeholder="اشرح الشكوى والموقع بالتفصيل..."></textarea>
         </div>
-        <button type="submit" class="btn btn-danger">إرسال البلاغ / الشكوى 🚨</button>
+        <button type="submit" class="btn btn-warning" style="width: 100%;">إرسال البلاغ فوراً 🚀</button>
       </form>
     </div>
   </div>
 
-  <!-- 4. الهيدر والقائمة (الثلاث شرط) -->
+  <!-- 🌐 الشريط العلوي Header -->
   <header>
-    <div class="logo">🎮 Falcon MC</div>
-    
+    <div class="logo">🦅 Falcon Server</div>
     <div class="header-actions">
-      <!-- زر الثلاث شرط -->
-      <div class="hamburger-menu" onclick="toggleMenu()">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-
-      <!-- القائمة المنسدلة -->
-      <div id="navDropdown" class="nav-dropdown">
-        <button onclick="openComplaintModal()">📝 تقديم شكوى / بلاغ</button>
-        <button onclick="fetchDashboardData(false)">🔄 تحديث البيانات يدوياً</button>
-        <button onclick="handleLogout()" style="color: var(--accent-red);">🚪 تسجيل الخروج</button>
+      <button onclick="toggleMenu()" class="btn btn-primary btn-sm">القائمة ☰</button>
+      <div id="navDropdown" class="dropdown-menu">
+        <button onclick="openComplaintModal()" class="dropdown-item">تقديم شكوى 📋</button>
+        <button onclick="handleLogout()" class="dropdown-item" style="color: var(--accent-red);">تسجيل الخروج 🚪</button>
       </div>
     </div>
   </header>
 
-  <!-- 5. المحتوى الرئيسي -->
+  <!-- 📐 المحتوى الرئيسي -->
   <div class="container">
     
-    <!-- الجانب الأيمن: بيانات الحساب والأخبار -->
-    <aside>
+    <!-- الجانب الأيسر: الملف والأخبار -->
+    <div>
       <div class="card">
-        <h3>👤 بيانات الحساب</h3>
-        <div class="profile-info">
-          <div class="profile-item"><span>اسم اللاعب:</span><b id="profIgn">---</b></div>
-          <div class="profile-item"><span>الاسم الحقيقي:</span><b id="profFullName">---</b></div>
-          <div class="profile-item"><span>كود اللاعب:</span><b id="profCode" style="color: var(--accent-blue);">---</b></div>
-          <div class="profile-item"><span>المستوى:</span><b id="profLevel">1</b></div>
-          <div class="profile-item"><span>الوظيفة:</span><b id="profJob" style="color: var(--accent-green);">مواطن</b></div>
-        </div>
+        <div class="card-title">الملف الشخصي 👤</div>
+        <p style="font-size: 15px; font-weight: bold;" id="profFullName">...</p>
+        <p class="text-muted">اسم اللاعب: <span id="profIgn" style="color: #fff;">...</span></p>
+        <p class="text-muted">كود اللاعب: <span id="profCode" style="color: var(--accent-gold);">...</span></p>
+        <p class="text-muted">المستوى: <span id="profLevel" style="color: #fff;">1</span> | الوظيفة: <span id="profJob" style="color: #fff;">مواطن</span></p>
       </div>
 
       <div class="card">
-        <h3>📢 الأخبار والتعميمات</h3>
+        <div class="card-title">آخر الأخبار 📢</div>
         <div id="newsList">
-          <p class="text-muted">لا توجد أخبار حالية.</p>
+          <p class="text-muted">جاري تحميل الأخبار...</p>
         </div>
       </div>
-    </aside>
+    </div>
 
-    <!-- الجانب الأيسر: القضايا والشكاوى -->
-    <main>
-      <!-- نموذج سريع لتقديم قضية -->
+    <!-- الجانب الأيمن: البلاغات والقضايا -->
+    <div>
       <div class="card">
-        <h3>🚨 تقديم بلاغ / قضية جديدة</h3>
+        <div class="card-title">إرسال بلاغ عاجل 🚨</div>
         <form onsubmit="handleSendEmergency(event)">
-          <div class="form-group">
-            <label>نوع القضية / البلاغ:</label>
-            <select id="emType" required>
-              <option value="سرقة 💰">سرقة 💰</option>
-              <option value="اعتداء / إطلاق نار 💥">اعتداء / إطلاق نار 💥</option>
-              <option value="حادث سير 🚗">حادث سير 🚗</option>
-              <option value="خطورة عالية ⚠️">خطورة عالية ⚠️</option>
-            </select>
+          <div style="display: grid; grid-template-columns: 1fr 2fr gap: 10px;">
+            <div class="form-group">
+              <label>النوع</label>
+              <select id="emType">
+                <option value="طلب شرطة 🚔">طلب شرطة 🚔</option>
+                <option value="بلاغ سرقة 💰">بلاغ سرقة 💰</option>
+                <option value="حالة طوارئ ⚠️">حالة طوارئ ⚠️</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>الموقع / تفاصيل البلاغ</label>
+              <input type="text" id="emLocation" required placeholder="مثال: البنك المركزي / الحي الشمالي">
+            </div>
           </div>
-          <div class="form-group">
-            <label>الموقع والتفاصيل:</label>
-            <input type="text" id="emLocation" placeholder="أدخل المكان بالتفصيل أو وصف القضية" required>
-          </div>
-          <button type="submit" class="btn btn-danger">إرسال القضية إلى مركز الشرطة 🚓</button>
+          <button type="submit" class="btn btn-danger" style="width: 100%;">إرسال النداء 📡</button>
         </form>
       </div>
 
-      <!-- قائمة القضايا -->
       <div class="card">
-        <h3>📋 قائمة القضايا المفتوحة والمغلقة</h3>
+        <div class="card-title">سجل القضايا والمحادثات المباشرة 💬</div>
         <div id="emergenciesList">
-          <p class="text-muted">جاري تحميل البيانات...</p>
+          <p class="text-muted">جاري تحميل القضايا...</p>
         </div>
       </div>
-    </main>
+    </div>
 
   </div>
 
-  <!-- JavaScript Code -->
   <script>
-    // ⚠️ ضع رابط Apps Script الخاص بك هنا
+    // ⚠️ استبدل هذا الرابط برابط Google Apps Script الخاص بك (المنتهي بـ /exec)
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-dIJJ8rjiwbt-ZFk3qjSYv6UjoUKC6PXydut-lvR6VYUepOj15o9Db7Dr1hIjSMrLFw/exec";
 
     let state = {
@@ -879,46 +408,64 @@
       userData: null
     };
 
+    let isUserTyping = false;
+
+    // --- 🔒 1. حماية أدوات المطور (Anti-F12 & Right-Click) ---
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
+      if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) { e.preventDefault(); return false; }
+      if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) { e.preventDefault(); return false; }
+    });
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // --- 🚀 2. إدارة التحديث التلقائي بدون تقطيع ---
     window.onload = () => {
       if (state.email) {
         document.getElementById("authModal").classList.add("hidden");
         fetchDashboardData(false);
       }
       
-      // إغلاق القائمة عند الضغط في أي مكان خارجها
       document.addEventListener("click", (e) => {
         if (!e.target.closest('.header-actions')) {
           document.getElementById("navDropdown").classList.remove("show");
         }
       });
 
-      // --- 🔄 الريفريش التلقائي الصامت كل 3 ثوانٍ ---
-      setInterval(() => {
-        if (state.email) {
-          fetchDashboardData(true); // true = تحديث صامت
+      // إيقاف التحديث عند التركيز في خانات الكتابة
+      document.addEventListener('focusin', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+          isUserTyping = true;
         }
-      }, 3000);
+      });
+
+      document.addEventListener('focusout', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+          setTimeout(() => {
+            const active = document.activeElement;
+            if (!active || (active.tagName !== 'INPUT' && active.tagName !== 'TEXTAREA')) {
+              isUserTyping = false;
+            }
+          }, 500);
+        }
+      });
+
+      // التحديث الصامت كل 4 ثوانٍ
+      setInterval(() => {
+        if (state.email && !isUserTyping) {
+          fetchDashboardData(true);
+        }
+      }, 4000);
     };
 
-    function toggleMenu() {
-      document.getElementById("navDropdown").classList.toggle("show");
-    }
-
-    function openComplaintModal() {
-      document.getElementById("navDropdown").classList.remove("show");
-      document.getElementById("complaintModal").classList.remove("hidden");
-    }
-
-    function closeComplaintModal() {
-      document.getElementById("complaintModal").classList.add("hidden");
-    }
-
+    function toggleMenu() { document.getElementById("navDropdown").classList.toggle("show"); }
+    function openComplaintModal() { document.getElementById("navDropdown").classList.remove("show"); document.getElementById("complaintModal").classList.remove("hidden"); }
+    function closeComplaintModal() { document.getElementById("complaintModal").classList.add("hidden"); }
     function toggleAuthMode() {
       const isLogin = document.getElementById("isLoginCheck").checked;
       document.getElementById("registerFields").classList.toggle("hidden", isLogin);
     }
 
-    // --- المصادقة ---
+    // --- 🔑 3. الدخول والتحقق بـ OTP ---
     async function handleSendOtp(e) {
       e.preventDefault();
       const email = document.getElementById("authEmail").value.trim();
@@ -928,91 +475,56 @@
       const isLogin = document.getElementById("isLoginCheck").checked;
 
       const btn = document.getElementById("sendOtpBtn");
-      btn.innerText = "جاري الإرسال...";
-      btn.disabled = true;
+      btn.innerText = "جاري الإرسال..."; btn.disabled = true;
 
       try {
-        const res = await apiCall({
-          action: "sendOtp",
-          email: email,
-          ign: ign,
-          fullName: fullName,
-          age: age,
-          isLogin: isLogin
-        });
-
+        const res = await apiCall({ action: "sendOtp", email, ign, fullName, age, isLogin });
         if (res.status === "success") {
           state.email = email;
           document.getElementById("otpReqForm").classList.add("hidden");
           document.getElementById("otpVerifyForm").classList.remove("hidden");
           document.getElementById("authSubtitle").innerText = "أدخل رمز OTP المرسل إلى بريدك الإلكتروني";
-        } else {
-          alert("خطأ: " + res.message);
-        }
-      } catch (err) {
-        alert("فشل الاتصال بالسيرفر!");
-      } finally {
-        btn.innerText = "إرسال رمز التحقق 🔑";
-        btn.disabled = false;
-      }
+        } else { alert("خطأ: " + res.message); }
+      } catch (err) { alert("فشل الاتصال بالسيرفر! تأكد من رابط Google Apps Script والإعدادات."); }
+      finally { btn.innerText = "إرسال رمز التحقق 🔑"; btn.disabled = false; }
     }
 
     async function handleVerifyOtp(e) {
       e.preventDefault();
       const otp = document.getElementById("authOtp").value.trim();
       const btn = document.getElementById("verifyOtpBtn");
-      btn.innerText = "جاري التحقق...";
-      btn.disabled = true;
+      btn.innerText = "جاري التحقق..."; btn.disabled = true;
 
       try {
-        const res = await apiCall({
-          action: "verifyOtp",
-          email: state.email,
-          otp: otp
-        });
-
+        const res = await apiCall({ action: "verifyOtp", email: state.email, otp });
         if (res.status === "success") {
           localStorage.setItem("falcon_email", state.email);
           document.getElementById("authModal").classList.add("hidden");
-          renderDashboard(res);
-        } else {
-          alert("خطأ: " + res.message);
-        }
-      } catch (err) {
-        alert("فشل التحقق من الرمز!");
-      } finally {
-        btn.innerText = "تأكيد الدخول 🚀";
-        btn.disabled = false;
-      }
+          renderDashboard(res, false);
+        } else { alert("خطأ: " + res.message); }
+      } catch (err) { alert("فشل التحقق من الرمز!"); }
+      finally { btn.innerText = "تأكيد الدخول 🚀"; btn.disabled = false; }
     }
 
-    // --- جلب وتحديث البيانات (مع دعم التحديث الصامت) ---
+    // --- 📊 4. جلب وعرض البيانات ---
     async function fetchDashboardData(isSilent = false) {
       if (!state.email) return;
       try {
-        const res = await apiCall({
-          action: "getDashboardData",
-          email: state.email
-        });
-        if (res.status === "success") {
-          renderDashboard(res, isSilent);
-        } else if (!isSilent) {
-          handleLogout();
-        }
+        const res = await apiCall({ action: "getDashboardData", email: state.email });
+        if (res.status === "success") { renderDashboard(res, isSilent); }
+        else if (!isSilent) { handleLogout(); }
       } catch (err) {}
     }
 
     function renderDashboard(data, isSilent = false) {
       state.userData = data;
 
-      // تحديث ملف اللاعب
-      document.getElementById("profIgn").innerText = data.ign;
-      document.getElementById("profFullName").innerText = data.fullName;
-      document.getElementById("profCode").innerText = data.playerCode;
-      document.getElementById("profLevel").innerText = data.level;
-      document.getElementById("profJob").innerText = data.job;
+      document.getElementById("profIgn").innerText = data.ign || "";
+      document.getElementById("profFullName").innerText = data.fullName || "";
+      document.getElementById("profCode").innerText = data.playerCode || "";
+      document.getElementById("profLevel").innerText = data.level || "1";
+      document.getElementById("profJob").innerText = data.job || "مواطن";
 
-      // تحديث الأخبار
       const newsContainer = document.getElementById("newsList");
       if (data.news && data.news.length > 0) {
         newsContainer.innerHTML = data.news.map(item => `
@@ -1026,32 +538,39 @@
         newsContainer.innerHTML = `<p class="text-muted">لا توجد أخبار جديدة.</p>`;
       }
 
-      // تحديث القضايا والشكاوى
       const list = data.isPolice ? data.allEmergenciesForPolice : data.myEmergencies;
       renderEmergencies(list, data.isPolice, isSilent);
     }
 
-    // --- عرض القضايا والحفاظ على نص الشات أثناء الريفريش الصامت ---
+    // --- 💬 5. عرض المحادثات والتحكم الصامت ---
     function renderEmergencies(list, isPolice, isSilent) {
       const container = document.getElementById("emergenciesList");
-
-      // حفظ النص الذي يكتبه المستخدم حالياً في خانات الشات لكي لا يضيع أثناء الريفريش التلقائي
-      const savedInputValues = {};
-      if (isSilent) {
-        document.querySelectorAll('.chat-input-bar input').forEach(input => {
-          if (input.value) {
-            savedInputValues[input.id] = input.value;
-          }
-        });
-      }
-
-      container.innerHTML = "";
-
       if (!list || list.length === 0) {
         container.innerHTML = "<p class='text-muted'>لا توجد قضايا مسجلة حالياً.</p>";
         return;
       }
 
+      // تحديث الشات فقط في التحديث الصامت لتجنب التقطيع
+      if (isSilent && container.children.length === list.length) {
+        list.forEach(item => {
+          const chatBox = document.getElementById(`chatBox-${item.rowId}`);
+          if (chatBox) {
+            let chatContent = (item.chatMessages || []).map(msg => `
+              <div class="chat-bubble ${msg.isPolice ? 'police-msg' : (msg.senderName === 'النظام' ? 'system-msg' : 'user-msg')}">
+                <b>${msg.senderName}:</b> ${msg.text}
+              </div>
+            `).join("");
+            
+            if (chatBox.innerHTML.trim() !== chatContent.trim()) {
+              chatBox.innerHTML = chatContent || '<p class="text-muted" style="font-size: 12px;">لا توجد رسائل بعد.</p>';
+              chatBox.scrollTop = chatBox.scrollHeight;
+            }
+          }
+        });
+        return;
+      }
+
+      container.innerHTML = "";
       list.forEach(item => {
         const isClosed = item.status.includes("مغلقة");
         const isWorking = item.status.includes("المباشرة");
@@ -1059,16 +578,9 @@
         let policeActions = "";
         if (isPolice) {
           policeActions = `
-            <div class="controls-group">
-              ${!isWorking && !isClosed ? `
-                <button onclick="handlePoliceAction('acceptEmergency', ${item.rowId})" class="btn btn-success btn-sm">مباشرة القضية 🚔</button>
-              ` : ''}
-              
-              ${!isClosed ? `
-                <button onclick="handlePoliceAction('closeEmergency', ${item.rowId})" class="btn btn-danger btn-sm">إلغاء / إغلاق القضية 🔒</button>
-              ` : `
-                <button onclick="handlePoliceAction('reopenEmergency', ${item.rowId})" class="btn btn-warning btn-sm">إعادة فتح القضية 🔓</button>
-              `}
+            <div style="display:flex; gap:5px; margin: 10px 0;">
+              ${!isWorking && !isClosed ? `<button onclick="handlePoliceAction('acceptEmergency', ${item.rowId})" class="btn btn-success btn-sm">مباشرة القضية 🚔</button>` : ''}
+              ${!isClosed ? `<button onclick="handlePoliceAction('closeEmergency', ${item.rowId})" class="btn btn-danger btn-sm">إغلاق القضية 🔒</button>` : `<button onclick="handlePoliceAction('reopenEmergency', ${item.rowId})" class="btn btn-warning btn-sm">إعادة فتح القضية 🔓</button>`}
             </div>
           `;
         }
@@ -1084,47 +596,36 @@
         card.innerHTML = `
           <div class="card-top">
             <h4 style="color: var(--accent-blue);">قضية #${item.rowId} - ${item.type}</h4>
-            <span class="badge">${item.status}</span>
+            <span class="news-badge">${item.status}</span>
           </div>
-          <p style="font-size: 14px;"><b>صاحب البلاغ:</b> ${item.fullName} (${item.playerCode})</p>
-          <p style="font-size: 14px;"><b>الموقع / التفاصيل:</b> ${item.location}</p>
-          <p style="font-size: 13px; color: var(--text-muted);"><b>الضابط المباشر:</b> ${item.officerName}</p>
-          <small style="font-size: 11px; color: #6b7280;">التاريخ: ${item.date}</small>
+          <p style="font-size: 13px;"><b>صاحب البلاغ:</b> ${item.fullName} (${item.playerCode})</p>
+          <p style="font-size: 13px;"><b>الموقع:</b> ${item.location}</p>
+          <p style="font-size: 12px; color: var(--text-muted);"><b>الضابط المباشر:</b> ${item.officerName}</p>
 
           ${policeActions}
 
           <div class="chat-container">
-            <h5 style="font-size: 13px; margin-bottom: 5px;">💬 المحادثة المباشرة:</h5>
             <div class="chat-messages" id="chatBox-${item.rowId}">
               ${chatContent || '<p class="text-muted" style="font-size: 12px;">لا توجد رسائل بعد.</p>'}
             </div>
-            
             ${!isClosed ? `
               <div class="chat-input-bar">
-                <input type="text" id="chatInput-${item.rowId}" placeholder="اكتب رسالتك..." onkeypress="if(event.key==='Enter') sendChatMessage(${item.rowId})">
+                <input type="text" id="chatInput-${item.rowId}" placeholder="اكتب رسالة..." onkeypress="if(event.key==='Enter') sendChatMessage(${item.rowId})">
                 <button onclick="sendChatMessage(${item.rowId})" class="btn btn-primary btn-sm">إرسال</button>
               </div>
-            ` : '<p style="font-size: 11px; color: var(--accent-red); margin-top: 5px;"><i>هذه القضية مغلقة.</i></p>'}
+            ` : ''}
           </div>
         `;
-
         container.appendChild(card);
-
-        // استرجاع نص الكتابة إن وجد
-        if (savedInputValues[`chatInput-${item.rowId}`]) {
-          document.getElementById(`chatInput-${item.rowId}`).value = savedInputValues[`chatInput-${item.rowId}`];
-        }
       });
     }
 
-    // --- تقديم الشكاوى / البلاغات ---
+    // --- 📤 6. إرسال البيانات والتفاعل ---
     async function handleSendEmergency(e) {
       e.preventDefault();
       const type = document.getElementById("emType").value;
       const location = document.getElementById("emLocation").value.trim();
-      await submitEmergency(type, location, () => {
-        document.getElementById("emLocation").value = "";
-      });
+      await submitEmergency(type, location, () => { document.getElementById("emLocation").value = ""; });
     }
 
     async function handleSendEmergencyModal(e) {
@@ -1145,30 +646,19 @@
         type: type,
         location: location
       });
-
       if (res.status === "success") {
-        alert("تم إرسال البلاغ / الشكوى بنجاح!");
+        alert("تم إرسال البلاغ بنجاح!");
         callback();
         fetchDashboardData(false);
       }
     }
 
-    // --- أوامر التحكم للشرطة ---
     async function handlePoliceAction(actionType, rowId) {
-      if (actionType === 'closeEmergency' && !confirm("هل أنت تأكد من إلغاء وإغلاق هذه القضية؟")) return;
-
-      const res = await apiCall({
-        action: actionType,
-        rowId: rowId,
-        officerName: state.userData.fullName
-      });
-
-      if (res.status === "success") {
-        fetchDashboardData(false);
-      }
+      if (actionType === 'closeEmergency' && !confirm("تأكيد إغلاق القضية؟")) return;
+      const res = await apiCall({ action: actionType, rowId: rowId, officerName: state.userData.fullName });
+      if (res.status === "success") fetchDashboardData(false);
     }
 
-    // --- الشات ---
     async function sendChatMessage(rowId) {
       const input = document.getElementById(`chatInput-${rowId}`);
       const text = input.value.trim();
@@ -1201,38 +691,5 @@
       location.reload();
     }
   </script>
-  <script>
-  // منع زر F12 واختصارات أدوات المطور (DevTools)
-  document.addEventListener('keydown', function(e) {
-    // 1. منع F12
-    if (e.key === 'F12' || e.keyCode === 123) {
-      e.preventDefault();
-      return false;
-    }
-
-    // 2. منع Ctrl + Shift + I (Inspect Element)
-    // 3. منع Ctrl + Shift + J (Console)
-    // 4. منع Ctrl + Shift + C (Element Selector)
-    if (e.ctrlKey && e.shiftKey && (
-      e.key === 'I' || e.key === 'i' || 
-      e.key === 'J' || e.key === 'j' || 
-      e.key === 'C' || e.key === 'c'
-    )) {
-      e.preventDefault();
-      return false;
-    }
-
-    // 5. منع Ctrl + U (عرض سورس الكود View Source)
-    if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) {
-      e.preventDefault();
-      return false;
-    }
-  });
-
-  // 6. منع القائمة المنسدلة عند الضغط بزر الماوس الأيمن (Right Click)
-  document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-  });
-</script>
 </body>
 </html>
