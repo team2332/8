@@ -124,6 +124,8 @@
       position: sticky;
       top: 0;
       z-index: 100;
+      flex-wrap: wrap;
+      gap: 15px;
     }
 
     .brand-logo {
@@ -136,6 +138,57 @@
       display: flex;
       align-items: center;
       gap: 10px;
+    }
+
+    /* --- Server Info Links Header --- */
+    .server-top-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .server-ip-badge {
+      background: rgba(0, 166, 255, 0.1);
+      border: 1px solid var(--border-cyan);
+      color: var(--neon-cyan);
+      padding: 7px 15px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .server-ip-badge:hover {
+      background: rgba(0, 166, 255, 0.25);
+      box-shadow: var(--glow-cyan);
+      transform: translateY(-2px);
+    }
+
+    .discord-badge {
+      background: rgba(157, 0, 255, 0.15);
+      border: 1px solid rgba(157, 0, 255, 0.4);
+      color: #c073ff;
+      padding: 7px 15px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .discord-badge:hover {
+      background: rgba(157, 0, 255, 0.35);
+      box-shadow: 0 0 15px rgba(157, 0, 255, 0.5);
+      color: #fff;
+      transform: translateY(-2px);
     }
 
     .nav-actions {
@@ -188,6 +241,8 @@
 
     @media (max-width: 900px) {
       .container { grid-template-columns: 1fr; }
+      header { justify-content: center; text-align: center; }
+      .server-top-info { justify-content: center; width: 100%; }
     }
 
     /* --- Cards & UI Elements --- */
@@ -414,6 +469,17 @@
   <div id="dashboardPage" class="page-view hidden">
     <header>
       <div class="brand-logo">🦅 FALCON ROLEPLAY</div>
+      
+      <!-- 🎮 IP السيرفر و سيرفر الديسكورد في أعلى الصفحة بعد تسجيل الدخول -->
+      <div class="server-top-info">
+        <div class="server-ip-badge" onclick="copyServerIp('falcons.tkmc.net')" title="انقر لنسخ IP السيرفر">
+          🎮 IP: <b>falcons.tkmc.net</b> 📋
+        </div>
+        <a href="https://discord.gg/ANpRUZ6m9n" target="_blank" rel="noopener noreferrer" class="discord-badge">
+          💬 سيرفر الديسكورد ↗
+        </a>
+      </div>
+
       <div class="nav-actions">
         <button onclick="toggleMenu()" class="btn btn-cyan btn-sm">القائمة ☰</button>
         <div id="navDropdown" class="dropdown-menu">
@@ -515,6 +581,15 @@
     };
 
     let isUserTyping = false;
+
+    // --- 📋 خاصية نسخ IP السيرفر ---
+    function copyServerIp(ipText) {
+      navigator.clipboard.writeText(ipText).then(() => {
+        alert("تم نسخ IP السيرفر بنجاح: " + ipText);
+      }).catch(() => {
+        alert("IP السيرفر: " + ipText);
+      });
+    }
 
     // --- 🔒 حماية أدوات المطور (F12) والماوس الأيمن ---
     document.addEventListener('keydown', function(e) {
